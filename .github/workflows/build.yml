@@ -1,0 +1,33 @@
+name: Auto-generate map
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - '2025-05/*.gpx'
+      - 'scripts/generate_map.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Generate Map
+        run: python scripts/generate_map.py
+
+      - name: Commit map
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add 2025-05/index.html
+          git commit -m "Auto-generate map" || echo "No changes"
+          git push
