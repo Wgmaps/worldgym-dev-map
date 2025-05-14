@@ -1,43 +1,53 @@
+
 import os
-import subprocess
+import folium
+import gpxpy
+import gpxpy.gpx
+import json
 
 def generate_leaflet_html(gpx_files, folder):
-    html = f"""<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>WorldGym 每日開發路線圖 - {folder}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/@tmcw/togeojson@0.16.0/dist/togeojson.umd.js"></script>
-</head>
-<body>
-  <h2 style="font-family: sans-serif; text-align: center;">WorldGym 每日開發路線圖 - {folder}</h2>
-  <div id="map" style="width: 100%; height: 90vh;"></div>
-  <script>
-    var map = L.map('map').setView([25.0330, 121.5654], 11);
-    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
-      maxZoom: 18
-    }}).addTo(map);
+    center = [25.0330, 121.5654]
+    m = folium.Map(location=center, zoom_start=11)
+    loaded = []
+    failed = []
 
-    const gpxFiles = {gpx_files};
+    for gpx_file in gpx_files:
+        try:
+            with open(os.path.join(folder, gpx_file), 'r', encoding='utf-8') as f:
+                gpx = gpxpy.parse(f)
 
-    gpxFiles.forEach(filename => {{
-      fetch(filename)
-        .then(res => res.text())
-        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-        .then(data => {{
-          var track = togeojson.gpx(data);
-          L.geoJSON(track, {{
-            style: {{ color: '#f00', weight: 3 }}
-          }}).bindPopup(filename).addTo(map);
-        }});
-    }});
-  </script>
-</body>
-</html>
-"""
+            track = {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": []
+                },
+                "properties": {"name": gpx_file}
+            }
+
+            for track_seg in gpx.tracks[0].segments:
+                for point in track_seg.points:
+                    track["geometry"]["coordinates"].append([point.longitude, point.latitude])
+
+            folium.GeoJson(track, name=gpx_file, tooltip=gpx_file).add_to(m)
+            loaded.append(gpx_file)
+        except Exception as e:
+            failed.append((gpx_file, str(e)))
+
+    # 在頁面上標示載入成功與失敗的清單
+    html = m.get_root().render()
+    html += "<div style='padding:1em;font-family:sans-serif'>"
+    if loaded:
+        html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
+        for f in loaded:
+            html += f"<li>{f}</li>"
+        html += "</ul>"
+    if failed:
+        html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
+        for f, err in failed:
+            html += f"<li>{f} - {err}</li>"
+        html += "</ul>"
+    html += "</div>"
     return html
 
 def update_home_index(months):
@@ -52,23 +62,16 @@ def main():
     folders = [f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")]
     generated = []
     for folder in folders:
-        gpx_files = [f for f in os.listdir(folder) if f.lower().endswith(".gpx")]
+        gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
         if not gpx_files:
             continue
         html = generate_leaflet_html(gpx_files, folder)
         with open(os.path.join(folder, "index.html"), "w", encoding="utf-8") as f:
             f.write(html)
         generated.append(folder)
-        print(f"✅ {folder}/index.html 產生完成")
 
     update_home_index(generated)
-    print("🏠 首頁 index.html 已更新完成")
-
-    subprocess.run(["git", "config", "--global", "user.email", "mapbot@worldgym.com"])
-    subprocess.run(["git", "config", "--global", "user.name", "mapbot"])
-    subprocess.run(["git", "add", "index.html"])
-    subprocess.run(["git", "commit", "-m", "auto: 更新首頁 index.html"])
-    subprocess.run(["git", "push"])
+    print("✅ 所有 index.html 重新產生完成")
 
 if __name__ == "__main__":
     main()
