@@ -3,7 +3,7 @@ import os
 import subprocess
 
 def generate_leaflet_html(gpx_files, folder):
-    html = f"""<!DOCTYPE html>
+    html = f'''<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -18,29 +18,27 @@ def generate_leaflet_html(gpx_files, folder):
   <div id="map" style="width: 100%; height: 90vh;"></div>
   <script>
     var map = L.map('map').setView([25.0330, 121.5654], 11);
-    L.tileLayer('https://{{{{s}}}}.tile.openstreetmap.org/{{{{z}}}}/{{{{x}}}}/{{{{y}}}}.png', {{{{
+    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
       maxZoom: 18
-    }}}}).addTo(map);
-"""
+    }}).addTo(map);
 
-    for gpx in gpx_files:
-        html += f"""
-    fetch('{gpx}')
-      .then(res => res.text())
-      .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-      .then(data => {{
-        var track = togeojson.gpx(data);
-        L.geoJSON(track, {{
-          style: {{ color: '#f00', weight: 3 }}
-        }}).bindPopup('{gpx}').addTo(map);
-      }});
-"""
+    const gpxFiles = {gpx_files};
 
-    html += """
+    gpxFiles.forEach(filename => {{
+      fetch(filename)
+        .then(res => res.text())
+        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+        .then(data => {{
+          var track = togeojson.gpx(data);
+          L.geoJSON(track, {{
+            style: {{ color: '#f00', weight: 3 }}
+          }}).bindPopup(filename).addTo(map);
+        }});
+    }});
   </script>
 </body>
 </html>
-"""
+'''
     return html
 
 def update_home_index(months):
