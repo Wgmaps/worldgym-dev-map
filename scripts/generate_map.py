@@ -18,9 +18,9 @@ def generate_leaflet_html(gpx_files, folder):
   <div id="map" style="width: 100%; height: 90vh;"></div>
   <script>
     var map = L.map('map').setView([25.0330, 121.5654], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {{
+    L.tileLayer('https://{{{{s}}}}.tile.openstreetmap.org/{{{{z}}}}/{{{{x}}}}/{{{{y}}}}.png', {{{{
       maxZoom: 18
-    }}).addTo(map);
+    }}}}).addTo(map);
 """
 
     for gpx in gpx_files:
