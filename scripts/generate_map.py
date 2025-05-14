@@ -1,4 +1,3 @@
-
 import os
 import folium
 import gpxpy
@@ -34,7 +33,6 @@ def generate_leaflet_html(gpx_files, folder):
         except Exception as e:
             failed.append((gpx_file, str(e)))
 
-    # 在頁面上標示載入成功與失敗的清單
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
     if loaded:
