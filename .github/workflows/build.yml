@@ -4,8 +4,8 @@ on:
   push:
     paths:
       - '**.gpx'
-      - '.github/workflows/build.yml'
       - 'scripts/**'
+      - '.github/workflows/**'
 
 jobs:
   build:
@@ -22,7 +22,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install folium gpxpy
+        python -m pip install --upgrade pip
+        pip install gpxpy folium
 
     - name: Generate Map
       run: python scripts/generate_map.py
@@ -32,7 +33,5 @@ jobs:
         git config --global user.name "github-actions"
         git config --global user.email "github-actions@github.com"
         git add .
-        git commit -m "Auto-generate map"
+        git commit -m "auto: 更新地圖" || echo "No changes to commit"
         git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
