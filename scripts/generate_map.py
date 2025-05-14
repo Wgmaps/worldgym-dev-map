@@ -18,7 +18,7 @@ def is_in_kaohsiung(lat, lon):
             KAOHSIUNG_BOUNDS["min_lon"] <= lon <= KAOHSIUNG_BOUNDS["max_lon"])
 
 def generate_leaflet_html(gpx_files, folder):
-    center = [22.63, 120.30]  # 高雄市中心
+    center = [22.7279, 120.3285]  # 楠梓中心
     m = folium.Map(location=center, zoom_start=13)
     loaded = []
     skipped = []
