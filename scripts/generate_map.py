@@ -17,14 +17,21 @@ def is_in_kaohsiung(lat, lon):
             KAOHSIUNG_BOUNDS["min_lon"] <= lon <= KAOHSIUNG_BOUNDS["max_lon"])
 
 def generate_leaflet_html(gpx_files, folder):
+    print(f"📍 建立地圖頁面：{folder}")
     m = folium.Map(location=[22.7279, 120.3285], zoom_start=13)  # 聚焦楠梓
     loaded = []
     skipped = []
     failed = []
 
     for gpx_file in gpx_files:
+        full_path = os.path.join(folder, gpx_file)
+        if not os.path.exists(full_path):
+            print(f"❌ 找不到 GPX 檔案：{full_path}")
+            failed.append((gpx_file, "找不到檔案"))
+            continue
+
         try:
-            with open(os.path.join(folder, gpx_file), 'r', encoding='utf-8') as f:
+            with open(full_path, 'r', encoding='utf-8') as f:
                 gpx = gpxpy.parse(f)
 
             coords = []
@@ -50,6 +57,7 @@ def generate_leaflet_html(gpx_files, folder):
             loaded.append(gpx_file)
         except Exception as e:
             failed.append((gpx_file, str(e)))
+            print(f"❌ 錯誤處理 GPX：{gpx_file} -> {e}")
 
     # 插入標題與回首頁按鈕
     title_html = f'''
@@ -103,8 +111,11 @@ def main():
     folders = [f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")]
     generated = []
     for folder in folders:
+        print(f"📂 處理資料夾：{folder}")
         gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
+        print(f"🔍 發現 GPX 檔案：{gpx_files}")
         if not gpx_files:
+            print(f"⚠️ {folder} 中沒有找到 GPX")
             continue
         html = generate_leaflet_html(gpx_files, folder)
         with open(os.path.join(folder, "index.html"), "w", encoding="utf-8") as f:
