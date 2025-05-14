@@ -17,25 +17,19 @@
       maxZoom: 18
     }).addTo(map);
 
-    fetch('0512MIKA DM.gpx')
-      .then(res => res.text())
-      .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-      .then(data => {
-        var track = togeojson.gpx(data);
-        L.geoJSON(track, {
-          style: { color: '#f00', weight: 3 }
-        }).bindPopup('0512MIKA DM.gpx').addTo(map);
-      });
+    const gpxFiles = ['DI 1.gpx', '0512MIKA DM.gpx'];
 
-    fetch('DI 1.gpx')
-      .then(res => res.text())
-      .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-      .then(data => {
-        var track = togeojson.gpx(data);
-        L.geoJSON(track, {
-          style: { color: '#f00', weight: 3 }
-        }).bindPopup('DI 1.gpx').addTo(map);
-      });
+    gpxFiles.forEach(filename => {
+      fetch(filename)
+        .then(res => res.text())
+        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+        .then(data => {
+          var track = togeojson.gpx(data);
+          L.geoJSON(track, {
+            style: { color: '#f00', weight: 3 }
+          }).bindPopup(filename).addTo(map);
+        });
+    });
   </script>
 </body>
 </html>
