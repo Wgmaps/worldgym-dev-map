@@ -13,9 +13,9 @@
   <div id="map" style="width: 100%; height: 90vh;"></div>
   <script>
     var map = L.map('map').setView([25.0330, 121.5654], 11);
-    L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18
-    }}).addTo(map);
+    }).addTo(map);
 
     fetch('0512MIKA DM.gpx')
       .then(res => res.text())
@@ -36,7 +36,6 @@
           style: { color: '#f00', weight: 3 }
         }).bindPopup('DI 1.gpx').addTo(map);
       });
-
   </script>
 </body>
 </html>
