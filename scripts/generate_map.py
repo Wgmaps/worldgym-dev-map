@@ -2,11 +2,10 @@ import os
 import folium
 import gpxpy
 import gpxpy.gpx
-import json
+from datetime import datetime
 
 def generate_leaflet_html(gpx_files, folder):
-    center = [25.0330, 121.5654]
-    m = folium.Map(location=center, zoom_start=11)
+    m = folium.Map(location=[25.0330, 121.5654], zoom_start=11)
     loaded = []
     failed = []
 
@@ -15,23 +14,39 @@ def generate_leaflet_html(gpx_files, folder):
             with open(os.path.join(folder, gpx_file), 'r', encoding='utf-8') as f:
                 gpx = gpxpy.parse(f)
 
-            track = {
-                "type": "Feature",
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": []
-                },
-                "properties": {"name": gpx_file}
-            }
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    points = [(p.latitude, p.longitude) for p in segment.points]
+                    if not points:
+                        raise ValueError("GPX 檔案中沒有座標點")
+                    name = gpx_file
+                    date_str = ""
+                    if segment.points and segment.points[0].time:
+                        date_str = segment.points[0].time.strftime("%Y-%m-%d")
+                        name += f" ({date_str})"
 
-            for track_seg in gpx.tracks[0].segments:
-                for point in track_seg.points:
-                    track["geometry"]["coordinates"].append([point.longitude, point.latitude])
-
-            folium.GeoJson(track, name=gpx_file, tooltip=gpx_file).add_to(m)
-            loaded.append(gpx_file)
+                    folium.PolyLine(points, color='red', weight=3, tooltip=name).add_to(m)
+                    loaded.append(name)
         except Exception as e:
             failed.append((gpx_file, str(e)))
+
+    # 插入標題與回首頁按鈕
+    header_html = '''
+    <h2 style="text-align: center; font-family: sans-serif;">
+        WorldGym 每日開發路線圖 - {folder}
+    </h2>
+    <div style="text-align: center; margin-bottom: 10px;">
+        <a href="../index.html" style="
+            background: #555;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-family: sans-serif;
+        ">⬅️ 返回首頁</a>
+    </div>
+    '''.replace("{folder}", folder)
+    m.get_root().html.add_child(folium.Element(header_html))
 
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
@@ -43,7 +58,7 @@ def generate_leaflet_html(gpx_files, folder):
     if failed:
         html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
         for f, err in failed:
-            html += f"<li>{f} - {err}</li>"
+            html += f"<li>{f}<br><code>{err}</code></li>"
         html += "</ul>"
     html += "</div>"
     return html
