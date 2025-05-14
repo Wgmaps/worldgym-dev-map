@@ -27,6 +27,16 @@
         }).bindPopup('0512MIKA DM.gpx').addTo(map);
       });
 
+    fetch('DI 1.gpx')
+      .then(res => res.text())
+      .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+      .then(data => {
+        var track = togeojson.gpx(data);
+        L.geoJSON(track, {
+          style: { color: '#f00', weight: 3 }
+        }).bindPopup('DI 1.gpx').addTo(map);
+      });
+
   </script>
 </body>
 </html>
