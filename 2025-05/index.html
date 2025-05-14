@@ -1,117 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-    
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    
-        <script>
-            L_NO_TOUCH = false;
-            L_DISABLE_3D = false;
-        </script>
-    
-    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
-    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
-    
-            <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <style>
-                #map_89f6e5b47a5c77d749b669e9e2596e75 {
-                    position: relative;
-                    width: 100.0%;
-                    height: 100.0%;
-                    left: 0.0%;
-                    top: 0.0%;
-                }
-                .leaflet-container { font-size: 1rem; }
-            </style>
-        
+  <meta charset="utf-8" />
+  <title>🌍🦍 WorldGym 每日開發地圖 - 2025-05</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet 地圖樣式 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- GPX 轉 GeoJSON 工具 -->
+  <script src="https://unpkg.com/togeojson@0.16.0"></script>
+
+  <!-- 可愛字體 Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Noto Sans TC', sans-serif;
+    }
+    h2 {
+      text-align: center;
+      font-size: 1.8em;
+      margin-top: 1em;
+    }
+    #map {
+      width: 100%;
+      height: 90vh;
+    }
+    .home-button {
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    .home-button a {
+      background-color: #74b9ff;
+      color: white;
+      text-decoration: none;
+      padding: 0.5em 1.2em;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1em;
+      display: inline-block;
+    }
+    .home-button a:hover {
+      background-color: #0984e3;
+    }
+  </style>
 </head>
 <body>
-    
-    
-    <h2 style="text-align: center; font-family: sans-serif;">
-        WorldGym 每日開發路線圖 - 2025-05
-    </h2>
-    <div style="text-align: center; margin-bottom: 10px;">
-        <a href="../index.html" style="
-            background: #555;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-family: sans-serif;
-        ">⬅️ 返回首頁</a>
-    </div>
-    
-    
-            <div class="folium-map" id="map_89f6e5b47a5c77d749b669e9e2596e75" ></div>
-        
+
+  <h2>🌍🦍 WorldGym 每日開發地圖 - 2025-05</h2>
+
+  <div class="home-button">
+    <a href="../index.html">🔙 回首頁</a>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    var map = L.map('map').setView([23.7, 121.0], 8);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    const gpxFiles = [
+      "0512MIKA DM.gpx",
+      "DI 1.gpx",
+      "mikadm.gpx"
+      // 🔁 可以自行加入更多檔名（確保這些檔案存在於同一資料夾內）
+    ];
+
+    gpxFiles.forEach(file => {
+      fetch(file)
+        .then(res => res.text())
+        .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+        .then(data => {
+          var track = togeojson.gpx(data);
+          L.geoJSON(track, {
+            style: { color: '#0984e3', weight: 3 }
+          }).bindPopup(file).addTo(map);
+        })
+        .catch(err => {
+          console.error(`❌ 無法載入 ${file}:`, err);
+        });
+    });
+  </script>
+
 </body>
-<script>
-    
-    
-            var map_89f6e5b47a5c77d749b669e9e2596e75 = L.map(
-                "map_89f6e5b47a5c77d749b669e9e2596e75",
-                {
-                    center: [25.033, 121.5654],
-                    crs: L.CRS.EPSG3857,
-                    ...{
-  "zoom": 11,
-  "zoomControl": true,
-  "preferCanvas": false,
-}
-
-                }
-            );
-
-            
-
-        
-    
-            var tile_layer_78d6f029dfe00a87b95611a02a0310ff = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-  "minZoom": 0,
-  "maxZoom": 19,
-  "maxNativeZoom": 19,
-  "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
-  "subdomains": "abc",
-  "detectRetina": false,
-  "tms": false,
-  "opacity": 1,
-}
-
-            );
-        
-    
-            tile_layer_78d6f029dfe00a87b95611a02a0310ff.addTo(map_89f6e5b47a5c77d749b669e9e2596e75);
-        
-    
-            var poly_line_8739e0ea64b52697b19cc8333303b4dd = L.polyline(
-                [[22.73045, 120.336708], [22.730399, 120.336681], [22.730347, 120.336655], [22.730296, 120.336628], [22.730259, 120.33662], [22.730219, 120.336614], [22.730203, 120.336614], [22.730173, 120.336678], [22.730139, 120.336702], [22.730107, 120.336725], [22.730082, 120.336741], [22.730046, 120.336752], [22.730032, 120.336754], [22.730038, 120.336784], [22.730048, 120.336793], [22.730084, 120.336772], [22.730095, 120.336761], [22.730119, 120.336732], [22.730134, 120.336698], [22.730165, 120.336661], [22.730211, 120.336637], [22.730246, 120.336606], [22.730279, 120.33658], [22.730311, 120.336557], [22.723909, 120.34636], [22.723905, 120.346364], [22.7239, 120.346367], [22.723896, 120.34637], [22.723891, 120.346373], [22.723887, 120.346377], [22.723882, 120.34638], [22.723847, 120.346383], [22.723823, 120.346395], [22.723843, 120.346415], [22.723867, 120.346453], [22.723877, 120.346471], [22.723902, 120.34646], [22.723907, 120.346456], [22.723912, 120.346452], [22.723911, 120.346439], [22.723893, 120.346405], [22.723875, 120.346371], [22.723856, 120.346337], [22.723838, 120.346303], [22.72382, 120.346269], [22.72378, 120.346275], [22.723766, 120.346278], [22.72374, 120.346279], [22.723747, 120.346279], [22.723747, 120.346279], [22.723747, 120.346279], [22.723747, 120.346279], [22.72403, 120.34616], [22.724014, 120.346192], [22.724017, 120.34624], [22.724013, 120.34627], [22.724008, 120.346287], [22.724005, 120.346308], [22.723988, 120.346332], [22.72396, 120.346353], [22.72392, 120.346362], [22.723875, 120.346349], [22.723831, 120.346356], [22.723804, 120.346348], [22.723747, 120.346372], [22.723697, 120.346386], [22.723646, 120.346397], [22.723594, 120.346412], [22.723538, 120.346426], [22.723482, 120.346441], [22.723423, 120.346459], [22.723363, 120.346478], [22.723301, 120.346491], [22.723239, 120.346508], [22.723129, 120.346543], [22.723087, 120.346555], [22.723047, 120.346566], [22.723011, 120.346577], [22.722976, 120.346582], [22.722944, 120.34659], [22.722917, 120.346595], [22.722884, 120.346579], [22.722874, 120.346569], [22.722867, 120.346528], [22.722873, 120.346477], [22.722883, 120.346427], [22.722889, 120.34638], [22.72289, 120.346342], [22.722874, 120.346315], [22.722865, 120.346309], [22.722838, 120.346306], [22.722821, 120.346312], [22.722814, 120.346315], [22.722807, 120.346319], [22.7228, 120.346322], [22.722789, 120.346328], [22.722777, 120.346332], [22.722768, 120.346332], [22.722761, 120.346338], [22.72271, 120.34633], [22.7227, 120.346332], [22.722714, 120.346344], [22.722711, 120.346341], [22.72271, 120.346299], [22.722731, 120.346263], [22.722678, 120.346213], [22.722612, 120.346186], [22.722546, 120.34616], [22.722529, 120.346157], [22.722511, 120.346155], [22.722494, 120.346152], [22.72248, 120.346151], [22.722497, 120.346173], [22.722502, 120.346178], [22.72246, 120.346184], [22.722464, 120.346185], [22.722451, 120.34618], [22.722446, 120.346179], [22.722481, 120.346189], [22.722483, 120.346189], [22.722484, 120.346189], [22.722484, 120.346188], [22.722484, 120.346188], [22.722484, 120.346188], [22.728184, 120.348547], [22.728196, 120.348613], [22.728291, 120.348536], [22.728368, 120.348528]],
-                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "red", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
-            ).addTo(map_89f6e5b47a5c77d749b669e9e2596e75);
-        
-    
-            poly_line_8739e0ea64b52697b19cc8333303b4dd.bindTooltip(
-                `<div>
-                     0512mika.gpx (2025-05-12)
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-</script>
-</html><div style='padding:1em;font-family:sans-serif'><h3>✅ 載入成功的 GPX：</h3><ul><li>0512mika.gpx (2025-05-12)</li></ul></div>
+</html>
