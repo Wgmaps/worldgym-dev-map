@@ -1,11 +1,10 @@
-
 import os
 import folium
 import gpxpy
 import gpxpy.gpx
-import json
+from datetime import datetime
 
-# 定義高雄的範圍 (粗略矩形)：經度與緯度範圍
+# 高雄座標範圍（粗略）
 KAOHSIUNG_BOUNDS = {
     "min_lat": 22.4,
     "max_lat": 22.95,
@@ -18,8 +17,7 @@ def is_in_kaohsiung(lat, lon):
             KAOHSIUNG_BOUNDS["min_lon"] <= lon <= KAOHSIUNG_BOUNDS["max_lon"])
 
 def generate_leaflet_html(gpx_files, folder):
-    center = [22.7279, 120.3285]  # 楠梓中心
-    m = folium.Map(location=center, zoom_start=13)
+    m = folium.Map(location=[22.7279, 120.3285], zoom_start=13)  # 聚焦楠梓
     loaded = []
     skipped = []
     failed = []
@@ -53,7 +51,26 @@ def generate_leaflet_html(gpx_files, folder):
         except Exception as e:
             failed.append((gpx_file, str(e)))
 
-    # 加入載入狀態說明
+    # 插入標題與回首頁按鈕
+    title_html = f'''
+    <h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
+      🦍🌍 WorldGym NZXN 每日開發地圖 {folder} 💰
+    </h2>
+    <div style="text-align: center; margin-bottom: 1em;">
+      <a href="../index.html" style="
+        background-color: #ff7675;
+        color: white;
+        padding: 0.5em 1.2em;
+        text-decoration: none;
+        border-radius: 10px;
+        font-family: 'Noto Sans TC', sans-serif;
+        font-weight: bold;
+      ">⬅️ 返回首頁</a>
+    </div>
+    '''
+    m.get_root().html.add_child(folium.Element(title_html))
+
+    # 顯示 GPX 載入狀態
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
     if loaded:
@@ -69,7 +86,7 @@ def generate_leaflet_html(gpx_files, folder):
     if failed:
         html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
         for f, err in failed:
-            html += f"<li>{f} - {err}</li>"
+            html += f"<li>{f}<br><code>{err}</code></li>"
         html += "</ul>"
     html += "</div>"
     return html
