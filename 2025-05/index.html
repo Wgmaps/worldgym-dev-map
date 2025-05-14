@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/togeojson@0.16.0"></script>
+  <script src="https://unpkg.com/@tmcw/togeojson@0.16.0/dist/togeojson.umd.js"></script>
 </head>
 <body>
   <h2 style="font-family: sans-serif; text-align: center;">WorldGym 每日開發路線圖 - 2025-05</h2>
@@ -17,7 +17,7 @@
       maxZoom: 18
     }).addTo(map);
 
-    const gpxFiles = ['0512MIKA DM.gpx', 'mikadm.gpx', 'DI 1.gpx'];
+    const gpxFiles = ['DI 1.gpx', 'mikadm.gpx', '0512MIKA DM.gpx'];
 
     gpxFiles.forEach(filename => {
       fetch(filename)
