@@ -1,12 +1,27 @@
+
 import os
 import folium
 import gpxpy
 import gpxpy.gpx
-from datetime import datetime
+import json
+
+# 定義高雄的範圍 (粗略矩形)：經度與緯度範圍
+KAOHSIUNG_BOUNDS = {
+    "min_lat": 22.4,
+    "max_lat": 22.95,
+    "min_lon": 120.15,
+    "max_lon": 120.45
+}
+
+def is_in_kaohsiung(lat, lon):
+    return (KAOHSIUNG_BOUNDS["min_lat"] <= lat <= KAOHSIUNG_BOUNDS["max_lat"] and
+            KAOHSIUNG_BOUNDS["min_lon"] <= lon <= KAOHSIUNG_BOUNDS["max_lon"])
 
 def generate_leaflet_html(gpx_files, folder):
-    m = folium.Map(location=[25.0330, 121.5654], zoom_start=11)
+    center = [22.63, 120.30]  # 高雄市中心
+    m = folium.Map(location=center, zoom_start=13)
     loaded = []
+    skipped = []
     failed = []
 
     for gpx_file in gpx_files:
@@ -14,40 +29,31 @@ def generate_leaflet_html(gpx_files, folder):
             with open(os.path.join(folder, gpx_file), 'r', encoding='utf-8') as f:
                 gpx = gpxpy.parse(f)
 
-            for track in gpx.tracks:
-                for segment in track.segments:
-                    points = [(p.latitude, p.longitude) for p in segment.points]
-                    if not points:
-                        raise ValueError("GPX 檔案中沒有座標點")
-                    name = gpx_file
-                    date_str = ""
-                    if segment.points and segment.points[0].time:
-                        date_str = segment.points[0].time.strftime("%Y-%m-%d")
-                        name += f" ({date_str})"
+            coords = []
+            for track_seg in gpx.tracks[0].segments:
+                for point in track_seg.points:
+                    if is_in_kaohsiung(point.latitude, point.longitude):
+                        coords.append([point.longitude, point.latitude])
 
-                    folium.PolyLine(points, color='red', weight=3, tooltip=name).add_to(m)
-                    loaded.append(name)
+            if not coords:
+                skipped.append(gpx_file)
+                continue
+
+            track = {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": coords
+                },
+                "properties": {"name": gpx_file}
+            }
+
+            folium.GeoJson(track, name=gpx_file, tooltip=gpx_file).add_to(m)
+            loaded.append(gpx_file)
         except Exception as e:
             failed.append((gpx_file, str(e)))
 
-    # 插入標題與回首頁按鈕
-    header_html = '''
-    <h2 style="text-align: center; font-family: sans-serif;">
-        WorldGym 每日開發路線圖 - {folder}
-    </h2>
-    <div style="text-align: center; margin-bottom: 10px;">
-        <a href="../index.html" style="
-            background: #555;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-family: sans-serif;
-        ">⬅️ 返回首頁</a>
-    </div>
-    '''.replace("{folder}", folder)
-    m.get_root().html.add_child(folium.Element(header_html))
-
+    # 加入載入狀態說明
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
     if loaded:
@@ -55,16 +61,21 @@ def generate_leaflet_html(gpx_files, folder):
         for f in loaded:
             html += f"<li>{f}</li>"
         html += "</ul>"
+    if skipped:
+        html += "<h3>⚠️ 未包含高雄區域的 GPX（已略過）：</h3><ul>"
+        for f in skipped:
+            html += f"<li>{f}</li>"
+        html += "</ul>"
     if failed:
         html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
         for f, err in failed:
-            html += f"<li>{f}<br><code>{err}</code></li>"
+            html += f"<li>{f} - {err}</li>"
         html += "</ul>"
     html += "</div>"
     return html
 
 def update_home_index(months):
-    html = "<h1>WorldGym 地圖首頁</h1><ul>"
+    html = "<h1>🌍🐒 WorldGym 地圖首頁</h1><ul>"
     for m in sorted(months):
         html += f'<li><a href="{m}/index.html">{m}</a></li>'
     html += "</ul>"
