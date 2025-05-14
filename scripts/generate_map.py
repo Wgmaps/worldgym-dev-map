@@ -1,9 +1,8 @@
-
 import os
 import subprocess
 
 def generate_leaflet_html(gpx_files, folder):
-    html = f'''<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
@@ -11,7 +10,7 @@ def generate_leaflet_html(gpx_files, folder):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/togeojson@0.16.0"></script>
+  <script src="https://unpkg.com/@tmcw/togeojson@0.16.0/dist/togeojson.umd.js"></script>
 </head>
 <body>
   <h2 style="font-family: sans-serif; text-align: center;">WorldGym 每日開發路線圖 - {folder}</h2>
@@ -38,7 +37,7 @@ def generate_leaflet_html(gpx_files, folder):
   </script>
 </body>
 </html>
-'''
+"""
     return html
 
 def update_home_index(months):
@@ -53,7 +52,7 @@ def main():
     folders = [f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")]
     generated = []
     for folder in folders:
-        gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
+        gpx_files = [f for f in os.listdir(folder) if f.lower().endswith(".gpx")]
         if not gpx_files:
             continue
         html = generate_leaflet_html(gpx_files, folder)
