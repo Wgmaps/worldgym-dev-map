@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <trk>
+  <name>傍晚跑步</name>
+  <type>running</type>
+  <trkseg>
+   <trkpt lat="22.7500790" lon="120.3319520">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500790" lon="120.3319520">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500200" lon="120.3319240">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500370" lon="120.3319400">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500350" lon="120.3319230">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500270" lon="120.3319150">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500210" lon="120.3319120">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500170" lon="120.3319170">
+    <ele>18.0</ele>
+   </trkpt>
+   <trkpt lat="22.7500160" lon="120.3319200">
+    <ele>18.0</ele>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
