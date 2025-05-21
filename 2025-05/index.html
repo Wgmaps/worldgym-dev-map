@@ -63,21 +63,40 @@
 <div class="folium-map" id="map_a18041249b458e44a073500f354e3cfc"></div>
 <script>
 setTimeout(function () {
-    if (typeof map !== 'undefined' && typeof shopLayer !== 'undefined') {
-        var searchControl = new L.Control.Search({
-            layer: shopLayer,
-            propertyName: 'name',
-            marker: false,
-            collapsed: false,
-            moveToLocation: function (latlng, title, map) {
-                map.setView(latlng, 17);
+    try {
+        if (typeof map !== 'undefined') {
+            let shopLayer = null;
+
+            // 嘗試自動抓圖層
+            map.eachLayer(function(layer) {
+                if (layer.feature && layer.feature.properties && layer.feature.properties.name) {
+                    if (!shopLayer) {
+                        shopLayer = L.layerGroup();
+                    }
+                    shopLayer.addLayer(layer);
+                }
+            });
+
+            if (shopLayer) {
+                var searchControl = new L.Control.Search({
+                    layer: shopLayer,
+                    propertyName: 'name',
+                    marker: false,
+                    collapsed: false,
+                    moveToLocation: function(latlng, title, map) {
+                        map.setView(latlng, 17);
+                    }
+                });
+                map.addControl(searchControl);
+                console.log("✅ 搜尋功能已啟用");
+            } else {
+                console.log("⚠️ 找不到可搜尋的圖層");
             }
-        });
-        map.addControl(searchControl);
-    } else {
-        console.log("地圖或 shopLayer 尚未就緒，無法啟用搜尋功能");
+        }
+    } catch (e) {
+        console.error("搜尋功能初始化失敗", e);
     }
-}, 500);
+}, 1000);
 </script></body>
 <script>
     
