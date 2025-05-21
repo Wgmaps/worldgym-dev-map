@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "楠梓 7-11 店"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [120.305, 22.731]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "德民路 麥當勞"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [120.319, 22.725]
+      }
+    }
+  ]
+}
