@@ -1,4 +1,27 @@
-<head><link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script></head><h1>🌍🐒 WorldGym 地圖首頁</h1><ul><li><a href="2025-05/index.html">2025-05</a></li></ul><body><script>
+<head><link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script><link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script></head><h1>🌍🐒 WorldGym 地圖首頁</h1><ul><li><a href="2025-05/index.html">2025-05</a></li></ul><body><script>
+setTimeout(function () {
+  if (typeof map !== 'undefined') {
+    var searchLayer = L.layerGroup();
+    map.eachLayer(function(layer) {
+      if (layer.feature && layer.feature.properties && layer.feature.properties.name) {
+        searchLayer.addLayer(layer);
+      }
+    });
+    if (searchLayer.getLayers().length > 0) {
+      var searchControl = new L.Control.Search({
+        layer: searchLayer,
+        propertyName: 'name',
+        marker: false,
+        collapsed: false,
+        moveToLocation: function(latlng, title, map) {
+          map.setView(latlng, 17);
+        }
+      });
+      map.addControl(searchControl);
+    }
+  }
+}, 1000);
+</script><script>
 setTimeout(function () {
   if (typeof map !== 'undefined') {
     var searchLayer = L.layerGroup();
