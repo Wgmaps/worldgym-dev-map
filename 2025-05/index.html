@@ -62,18 +62,20 @@
 </div>
 <div class="folium-map" id="map_a18041249b458e44a073500f354e3cfc"></div>
 <script>
-setTimeout(function() {
-    if (typeof shopLayer !== 'undefined') {
+setTimeout(function () {
+    if (typeof map !== 'undefined' && typeof shopLayer !== 'undefined') {
         var searchControl = new L.Control.Search({
             layer: shopLayer,
             propertyName: 'name',
             marker: false,
             collapsed: false,
-            moveToLocation: function(latlng, title, map) {
+            moveToLocation: function (latlng, title, map) {
                 map.setView(latlng, 17);
             }
         });
         map.addControl(searchControl);
+    } else {
+        console.log("地圖或 shopLayer 尚未就緒，無法啟用搜尋功能");
     }
 }, 500);
 </script></body>
