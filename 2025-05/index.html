@@ -66,34 +66,6 @@ setTimeout(() => {
   const mapObj = window.map || map_a18041249b458e44a073500f354e3cfc;
   const layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
 
-  fetch("shops.json")
-    .then(res => res.json())
-    .then(data => {
-      const shopLayer = L.geoJSON(data, {
-        onEachFeature: function (feature, layer) {
-          const name = feature.properties.name || "未知地點";
-          const note = feature.properties.note || "";
-          const emoji = feature.properties.emoji || "📌";
-          const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("\n", "<br>")}`;
-          layer.bindPopup(popup);
-          layer.feature = { properties: { name } };
-        }
-      }).addTo(mapObj);
-
-      layer_control.addOverlay(shopLayer, "🏪 開發商家");
-
-      const searchControl = new L.Control.Search({
-        layer: shopLayer,
-        propertyName: 'name',
-        marker: false,
-        collapsed: false,
-        moveToLocation: function(latlng, title, map) {
-          map.setView(latlng, 17);
-        }
-      });
-      mapObj.addControl(searchControl);
-    });
-}, 500);
 </script><script>
 // 強制顯示圖層控制器（即使尚未加載地標）
 setTimeout(() => {
