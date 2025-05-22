@@ -1,22 +1,21 @@
 <!DOCTYPE html>
+
 <html>
 <head>
-    
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
-    
-            <meta name="viewport" content="width=device-width,
-                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-            <style>
+<meta content="text/html; charset=utf-8" http-equiv="content-type"/>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css" rel="stylesheet"/>
+<meta content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<style>
                 #map_a18041249b458e44a073500f354e3cfc {
                     position: relative;
                     width: 100.0%;
@@ -26,16 +25,14 @@
                 }
                 .leaflet-container { font-size: 1rem; }
             </style>
-
-            <style>html, body {
+<style>html, body {
                 width: 100%;
                 height: 100%;
                 margin: 0;
                 padding: 0;
             }
             </style>
-
-            <style>#map {
+<style>#map {
                 position:absolute;
                 top:0;
                 bottom:0;
@@ -43,22 +40,17 @@
                 left:0;
                 }
             </style>
-
-            <script>
+<script>
                 L_NO_TOUCH = false;
                 L_DISABLE_3D = false;
             </script>
-
-        
-</head>
+<link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script></head>
 <body>
-    
-    
-    <h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
+<h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
       🦍🌍 WorldGym NZXN 每日開發地圖 2025-05 💰
     </h2>
-    <div style="text-align: center; margin-bottom: 1em;">
-      <a href="../index.html" style="
+<div style="text-align: center; margin-bottom: 1em;">
+<a href="../index.html" style="
         background-color: #ff7675;
         color: white;
         padding: 0.5em 1.2em;
@@ -67,12 +59,47 @@
         font-family: 'Noto Sans TC', sans-serif;
         font-weight: bold;
       ">⬅️ 返回首頁</a>
-    </div>
-    
-    
-            <div class="folium-map" id="map_a18041249b458e44a073500f354e3cfc" ></div>
-        
-</body>
+</div>
+<div class="folium-map" id="map_a18041249b458e44a073500f354e3cfc"></div>
+<script>
+setTimeout(function () {
+  const mapObj = map_a18041249b458e44a073500f354e3cfc;
+
+  // 商家資料（範例）
+  const shopData = [
+    { name: "7-11 高科店", lat: 22.727, lon: 120.300, status: "已拜訪" },
+    { name: "全家 大學路店", lat: 22.733, lon: 120.310, status: "已合作" },
+    { name: "麥當勞 德民店", lat: 22.728, lon: 120.316, status: "尚未拜訪" }
+  ];
+
+  const shopLayer = L.layerGroup();
+  shopData.forEach(shop => {
+    const marker = L.marker([shop.lat, shop.lon], { title: shop.name })
+      .bindPopup(`<b>${shop.name}</b><br>狀態：${shop.status}`);
+    marker.feature = { properties: { name: shop.name } };
+    shopLayer.addLayer(marker);
+  });
+  shopLayer.addTo(mapObj);
+
+  // 圖層控制器
+  if (typeof layer_control === "undefined") {
+    layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
+  }
+  layer_control.addOverlay(shopLayer, "🏪 特約商家");
+
+  // 搜尋欄位
+  const searchControl = new L.Control.Search({
+    layer: shopLayer,
+    propertyName: 'name',
+    marker: false,
+    collapsed: false,
+    moveToLocation: function (latlng, title, map) {
+      map.setView(latlng, 17);
+    }
+  });
+  mapObj.addControl(searchControl);
+}, 1000);
+</script></body>
 <script>
     
     
@@ -1374,4 +1401,4 @@
             geo_json_8d3ab8b37a075e0c94d9d7bd899f3d1a.addTo(map_a18041249b458e44a073500f354e3cfc);
         
 </script>
-</html><div style='padding:1em;font-family:sans-serif'><h3>✅ 載入成功的 GPX：</h3><ul><li>0514XUAN3.gpx</li><li>午後跑步 (2).gpx</li><li>午後電動自行車騎乘.gpx</li><li>0516塔拉.gpx</li><li>517renee.gpx</li><li>午後騎乘 (5).gpx</li><li>0519AMBER.gpx</li><li>午後騎乘.gpx</li><li>20250513092015-50019-data.gpx</li><li>午後騎乘 (4).gpx</li><li>517EDEN.gpx</li><li>0512mika.gpx</li><li>0516Mia.gpx</li><li>0514Jerry.gpx</li><li>午後跑步 (3).gpx</li><li>Jerry_5_20DM.gpx</li><li>0519Bryan.gpx</li><li>0514XUAN2.gpx</li><li>0519 kevin.gpx</li><li>0515MIKA.gpx</li><li>午後騎乘 (1).gpx</li><li>513ADAM.gpx</li><li>午後騎乘 (3).gpx</li><li>午後跑步 (5).gpx</li><li>午後騎乘 (2).gpx</li><li>0517塔拉.gpx</li><li>午後跑步 (1).gpx</li><li>0520Kevin.gpx</li><li>0517Bryan.gpx</li><li>0515BEN.gpx</li><li>午後跑步 (4).gpx</li><li>0514Xuan.gpx</li><li>0512Kevin.gpx</li><li>518renee.gpx</li><li>0514Bryan.gpx</li><li>0518ADAM.gpx</li></ul></div>
+</html><div style="padding:1em;font-family:sans-serif"><h3>✅ 載入成功的 GPX：</h3><ul><li>0514XUAN3.gpx</li><li>午後跑步 (2).gpx</li><li>午後電動自行車騎乘.gpx</li><li>0516塔拉.gpx</li><li>517renee.gpx</li><li>午後騎乘 (5).gpx</li><li>0519AMBER.gpx</li><li>午後騎乘.gpx</li><li>20250513092015-50019-data.gpx</li><li>午後騎乘 (4).gpx</li><li>517EDEN.gpx</li><li>0512mika.gpx</li><li>0516Mia.gpx</li><li>0514Jerry.gpx</li><li>午後跑步 (3).gpx</li><li>Jerry_5_20DM.gpx</li><li>0519Bryan.gpx</li><li>0514XUAN2.gpx</li><li>0519 kevin.gpx</li><li>0515MIKA.gpx</li><li>午後騎乘 (1).gpx</li><li>513ADAM.gpx</li><li>午後騎乘 (3).gpx</li><li>午後跑步 (5).gpx</li><li>午後騎乘 (2).gpx</li><li>0517塔拉.gpx</li><li>午後跑步 (1).gpx</li><li>0520Kevin.gpx</li><li>0517Bryan.gpx</li><li>0515BEN.gpx</li><li>午後跑步 (4).gpx</li><li>0514Xuan.gpx</li><li>0512Kevin.gpx</li><li>518renee.gpx</li><li>0514Bryan.gpx</li><li>0518ADAM.gpx</li></ul></div>
