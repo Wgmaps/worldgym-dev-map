@@ -62,37 +62,6 @@
 </div>
 <div class="folium-map" id="map_a18041249b458e44a073500f354e3cfc"></div>
 <script>
-setTimeout(function () {
-  const mapObj = map_a18041249b458e44a073500f354e3cfc;
-
-  const shopLayer = L.layerGroup();
-  shopData.forEach(shop => {
-    const marker = L.marker([shop.lat, shop.lon], { title: shop.name })
-      .bindPopup(`<b>${shop.name}</b><br>狀態：${shop.status}`);
-    marker.feature = { properties: { name: shop.name } };
-    shopLayer.addLayer(marker);
-  });
-  shopLayer.addTo(mapObj);
-
-  // 圖層控制器
-  if (typeof layer_control === "undefined") {
-    layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
-  }
-  layer_control.addOverlay(shopLayer, "🏪 開發商家");
-
-  // 搜尋欄位
-  const searchControl = new L.Control.Search({
-    layer: shopLayer,
-    propertyName: 'name',
-    marker: false,
-    collapsed: false,
-    moveToLocation: function (latlng, title, map) {
-      map.setView(latlng, 17);
-    }
-  });
-  mapObj.addControl(searchControl);
-}, 1000);
-</script><script>
 setTimeout(() => {
   fetch("shops.json")
     .then(res => res.json())
