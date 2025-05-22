@@ -85,7 +85,7 @@ setTimeout(function () {
   if (typeof layer_control === "undefined") {
     layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
   }
-  layer_control.addOverlay(shopLayer, "🏪 特約商家");
+  layer_control.addOverlay(shopLayer, "🏪 開發商家");
 
   // 搜尋欄位
   const searchControl = new L.Control.Search({
@@ -132,7 +132,7 @@ setTimeout(() => {
       if (typeof layer_control === "undefined") {
         layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
       }
-      layer_control.addOverlay(shopLayer, "🏪 特約商家");
+      layer_control.addOverlay(shopLayer, "🏪 開發商家");
     });
 }, 1000);
 </script></body>
