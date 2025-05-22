@@ -65,13 +65,6 @@
 setTimeout(function () {
   const mapObj = map_a18041249b458e44a073500f354e3cfc;
 
-  // 商家資料（範例）
-  const shopData = [
-    { name: "7-11 高科店", lat: 22.727, lon: 120.300, status: "已拜訪" },
-    { name: "全家 大學路店", lat: 22.733, lon: 120.310, status: "已合作" },
-    { name: "麥當勞 德民店", lat: 22.728, lon: 120.316, status: "尚未拜訪" }
-  ];
-
   const shopLayer = L.layerGroup();
   shopData.forEach(shop => {
     const marker = L.marker([shop.lat, shop.lon], { title: shop.name })
