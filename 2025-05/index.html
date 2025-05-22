@@ -44,7 +44,7 @@
                 L_NO_TOUCH = false;
                 L_DISABLE_3D = false;
             </script>
-<link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script></head>
+<link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script><link href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" rel="stylesheet"/><script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script></head>
 <body>
 <h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
       🦍🌍 WorldGym NZXN 每日開發地圖 2025-05 💰
@@ -98,6 +98,42 @@ setTimeout(function () {
     }
   });
   mapObj.addControl(searchControl);
+}, 1000);
+</script><script>
+setTimeout(() => {
+  fetch("shops.json")
+    .then(res => res.json())
+    .then(data => {
+      const mapObj = window.map || map_a18041249b458e44a073500f354e3cfc;
+      const shopLayer = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          const name = feature.properties.name || "未知地點";
+          const note = feature.properties.note || "";
+          const emoji = feature.properties.emoji || "📌";
+          const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("\n", "<br>")}`;
+          layer.bindPopup(popup);
+          layer.feature = { properties: { name } }; // 給搜尋用
+        }
+      }).addTo(mapObj);
+
+      // 搜尋控制器
+      const searchControl = new L.Control.Search({
+        layer: shopLayer,
+        propertyName: 'name',
+        marker: false,
+        collapsed: false,
+        moveToLocation: function(latlng, title, map) {
+          map.setView(latlng, 17);
+        }
+      });
+      mapObj.addControl(searchControl);
+
+      // 圖層控制器
+      if (typeof layer_control === "undefined") {
+        layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
+      }
+      layer_control.addOverlay(shopLayer, "🏪 特約商家");
+    });
 }, 1000);
 </script></body>
 <script>
