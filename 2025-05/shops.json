@@ -4,21 +4,33 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "楠梓 7-11 店"
+        "name": "全家 大學路店",
+        "status": "已合作",
+        "note": "mika\n0522",
+        "emoji": "📌"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [120.305, 22.731]
+        "coordinates": [
+          120.31,
+          22.733
+        ]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "德民路 麥當勞"
+        "name": "7-11 中正店",
+        "status": "已拜訪",
+        "note": "kevin\n0520",
+        "emoji": "📌"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [120.319, 22.725]
+        "coordinates": [
+          120.305,
+          22.731
+        ]
       }
     }
   ]
