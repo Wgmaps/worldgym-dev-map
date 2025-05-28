@@ -78,6 +78,7 @@ def generate_leaflet_html(gpx_files, folder):
     </div>
     '''
     m.get_root().html.add_child(folium.Element(title_html))
+    m.get_root().html.add_child(folium.Element('''<link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" />'''))
     m.get_root().html.add_child(folium.Element('''
 <!-- 插入商家搜尋功能與圖層控制器 -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" />
