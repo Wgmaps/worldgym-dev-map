@@ -100,7 +100,7 @@ def generate_leaflet_html(gpx_files, folder):
     return html
 
 def update_home_index(months):
-    html = "<h1>🌍🐒 WorldGym 地圖首頁</h1><ul>"
+    html = "<h1>🌍🦍 WorldGym 地圖首頁💰</h1><ul>"
     for m in sorted(months):
         html += f'<li><a href="{m}/index.html">{m}</a></li>'
     html += "</ul>"
