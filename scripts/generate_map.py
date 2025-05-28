@@ -3,6 +3,7 @@ import folium
 import gpxpy
 import gpxpy.gpx
 from datetime import datetime
+import json
 
 # 高雄座標範圍（粗略）
 KAOHSIUNG_BOUNDS = {
@@ -77,6 +78,46 @@ def generate_leaflet_html(gpx_files, folder):
     </div>
     '''
     m.get_root().html.add_child(folium.Element(title_html))
+    m.get_root().html.add_child(folium.Element('''
+<!-- 插入商家搜尋功能與圖層控制器 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" />
+<script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script>
+<script>
+setTimeout(() => {
+  const mapObj = window.map || map_a18041249b458e44a073500f354e3cfc;
+  const layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
+
+  fetch("shops.json")
+    .then(res => res.json())
+    .then(data => {
+      const shopLayer = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+          const name = feature.properties.name || "未知地點";
+          const note = feature.properties.note || "";
+          const emoji = feature.properties.emoji || "📌";
+          const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("
+", "<br>")}`;
+          layer.bindPopup(popup);
+          layer.feature = { properties: { name } };
+        }
+      }).addTo(mapObj);
+
+      layer_control.addOverlay(shopLayer, "🏪 開發商家");
+
+      const searchControl = new L.Control.Search({
+        layer: shopLayer,
+        propertyName: 'name',
+        marker: false,
+        collapsed: false,
+        moveToLocation: function(latlng, title, map) {
+          map.setView(latlng, 17);
+        }
+      });
+      mapObj.addControl(searchControl);
+    });
+}, 500);
+</script>
+'''))
 
     # 顯示 GPX 載入狀態
     html = m.get_root().render()
