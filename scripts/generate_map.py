@@ -36,7 +36,8 @@ def generate_leaflet_html(gpx_files, folder):
                 gpx = gpxpy.parse(f)
 
             coords = []
-            for track_seg in gpx.tracks[0].segments:
+            for track in gpx.tracks:
+        for track_seg in track.segments:
                 for point in track_seg.points:
                     if is_in_kaohsiung(point.latitude, point.longitude):
                         coords.append([point.longitude, point.latitude])
