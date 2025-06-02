@@ -25,7 +25,6 @@ def generate_leaflet_html(gpx_files, folder):
     failed = []
 
     for gpx_file in gpx_files:
-        coords = []
         full_path = os.path.join(folder, gpx_file)
         if not os.path.exists(full_path):
             print(f"❌ 找不到 GPX 檔案：{full_path}")
@@ -36,7 +35,7 @@ def generate_leaflet_html(gpx_files, folder):
             with open(full_path, 'r', encoding='utf-8') as f:
                 gpx = gpxpy.parse(f)
 
-            # removed global coords initialization
+            coords = []
             for track_seg in gpx.tracks[0].segments:
                 for point in track_seg.points:
                     if is_in_kaohsiung(point.latitude, point.longitude):
