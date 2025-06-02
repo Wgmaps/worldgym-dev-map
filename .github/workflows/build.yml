@@ -25,7 +25,7 @@ jobs:
       run: pip install folium gpxpy
 
     - name: Generate Map
-      run: python generate_map.py
+      run: python scripts/generate_map.py
 
     - name: Commit and Push Map
       run: |
