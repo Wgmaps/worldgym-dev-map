@@ -6,7 +6,7 @@
 ---
 
 ### 📍 點我打開地圖：  
-[▶️ 開啟 2025-05 地圖](https://wgmaps.github.io/worldgym-dev-map/2025-05/)
+[▶️ 開啟 2025-06 地圖](https://wgmaps.github.io/worldgym-dev-map/2025-06/index.html)
 
 ### 🗺️ 首頁連結：  
 [🏠 地圖首頁](https://wgmaps.github.io/worldgym-dev-map/)
