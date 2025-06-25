@@ -19,7 +19,31 @@ def is_in_kaohsiung(lat, lon):
 
 def generate_leaflet_html(gpx_files, folder):
     print(f"📍 建立地圖頁面：{folder}")
-    m = folium.Map(location=[22.7279, 120.3285], zoom_start=13)  # 聚焦楠梓
+    m = folium.Map(location=[22.7279, 120.3285], zoom_start=13)
+
+    # 新增：讀取商家資料並加入圖層控制器
+    shop_layer = folium.FeatureGroup(name='📍 開發商家', show=True)
+    try:
+        with open(os.path.join(folder, "shops.json"), "r", encoding="utf-8") as f:
+            shops = json.load(f)
+            for feature in shops["features"]:
+                lon, lat = feature["geometry"]["coordinates"]
+                name = feature["properties"].get("name", "")
+                note = feature["properties"].get("note", "")
+                emoji = feature["properties"].get("emoji", "📍")
+                popup_html = f"<b>{emoji} {name}</b><br>{note}"
+                folium.Marker(
+                    location=[lat, lon],
+                    popup=popup_html,
+                    icon=folium.Icon(color="red", icon="info-sign")
+                ).add_to(shop_layer)
+        shop_layer.add_to(m)
+    except Exception as e:
+        print("⚠️ 無法讀取 shops.json：", e)
+
+    # 新增圖層控制器
+    folium.LayerControl(collapsed=False).add_to(m)
+  # 聚焦楠梓
     loaded = []
     skipped = []
     failed = []
@@ -121,30 +145,6 @@ setTimeout(() => {
 '''))
 
     # 顯示 GPX 載入狀態
-    
-    # 讀取商家資料（如果存在 shops.json）
-    import json
-    shop_layer = folium.FeatureGroup(name='📌 開發商家', show=True)
-    try:
-        with open("shops.json", "r", encoding="utf-8") as f:
-            shop_data = json.load(f)
-            for feature in shop_data["features"]:
-                lon, lat = feature["geometry"]["coordinates"]
-                name = feature["properties"].get("name", "")
-                note = feature["properties"].get("note", "")
-                emoji = feature["properties"].get("emoji", "📌")
-                popup_html = f"<b>{emoji} {name}</b><br>{note}"
-                folium.Marker(
-                    location=[lat, lon],
-                    popup=popup_html,
-                    icon=folium.Icon(color='red', icon='info-sign')
-                ).add_to(shop_layer)
-        shop_layer.add_to(m)
-    except Exception as e:
-        print("⚠️ 無法讀取 shops.json 或資料格式錯誤：", e)
-
-    folium.LayerControl(collapsed=False).add_to(m)
-
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
     if loaded:
