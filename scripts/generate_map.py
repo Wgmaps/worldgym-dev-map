@@ -121,6 +121,30 @@ setTimeout(() => {
 '''))
 
     # 顯示 GPX 載入狀態
+    
+    # 讀取商家資料（如果存在 shops.json）
+    import json
+    shop_layer = folium.FeatureGroup(name='📌 開發商家', show=True)
+    try:
+        with open("shops.json", "r", encoding="utf-8") as f:
+            shop_data = json.load(f)
+            for feature in shop_data["features"]:
+                lon, lat = feature["geometry"]["coordinates"]
+                name = feature["properties"].get("name", "")
+                note = feature["properties"].get("note", "")
+                emoji = feature["properties"].get("emoji", "📌")
+                popup_html = f"<b>{emoji} {name}</b><br>{note}"
+                folium.Marker(
+                    location=[lat, lon],
+                    popup=popup_html,
+                    icon=folium.Icon(color='red', icon='info-sign')
+                ).add_to(shop_layer)
+        shop_layer.add_to(m)
+    except Exception as e:
+        print("⚠️ 無法讀取 shops.json 或資料格式錯誤：", e)
+
+    folium.LayerControl(collapsed=False).add_to(m)
+
     html = m.get_root().render()
     html += "<div style='padding:1em;font-family:sans-serif'>"
     if loaded:
