@@ -1,195 +1,71 @@
+
 import os
-import folium
-import gpxpy
-import gpxpy.gpx
-from datetime import datetime
 import json
+import gpxpy
+import folium
 
-# 高雄座標範圍（粗略）
-KAOHSIUNG_BOUNDS = {
-    "min_lat": 22.4,
-    "max_lat": 22.95,
-    "min_lon": 120.15,
-    "max_lon": 120.45
-}
+# GPX 路徑與輸出地圖資料夾
+folder = "2025-06"
+output_file = os.path.join(folder, "index.html")
+gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
 
-def is_in_kaohsiung(lat, lon):
-    return (KAOHSIUNG_BOUNDS["min_lat"] <= lat <= KAOHSIUNG_BOUNDS["max_lat"] and
-            KAOHSIUNG_BOUNDS["min_lon"] <= lon <= KAOHSIUNG_BOUNDS["max_lon"])
+# 初始化地圖（高雄市中心）
+m = folium.Map(location=[22.6273, 120.3014], zoom_start=13, tiles="OpenStreetMap")
 
-def generate_leaflet_html(gpx_files, folder):
-    print(f"📍 建立地圖頁面：{folder}")
-    m = folium.Map(location=[22.7279, 120.3285], zoom_start=13)
+# GPX 路線圖層群組
+route_group = folium.FeatureGroup(name="🛣️ 開發路線")
 
-    # 新增：讀取商家資料並加入圖層控制器
-    shop_layer = folium.FeatureGroup(name='📍 開發商家', show=True)
-    try:
-        with open(os.path.join(folder, "shops.json"), "r", encoding="utf-8") as f:
-            shops = json.load(f)
-            for feature in shops["features"]:
-                lon, lat = feature["geometry"]["coordinates"]
-                name = feature["properties"].get("name", "")
-                note = feature["properties"].get("note", "")
-                emoji = feature["properties"].get("emoji", "📍")
-                popup_html = f"<b>{emoji} {name}</b><br>{note}"
-                folium.Marker(
-                    location=[lat, lon],
-                    popup=popup_html,
-                    icon=folium.Icon(color="red", icon="info-sign")
-                ).add_to(shop_layer)
-        shop_layer.add_to(m)
-    except Exception as e:
-        print("⚠️ 無法讀取 shops.json：", e)
+for gpx_file in gpx_files:
+    path = os.path.join(folder, gpx_file)
+    with open(path, "r", encoding="utf-8") as f:
+        gpx = gpxpy.parse(f)
+        for track in gpx.tracks:
+            for segment in track.segments:
+                coords = [(point.latitude, point.longitude) for point in segment.points]
+                folium.PolyLine(coords, color="blue", weight=4, opacity=0.8, tooltip=gpx_file).add_to(route_group)
 
-    # 新增圖層控制器
-    folium.LayerControl(collapsed=False).add_to(m)
-  # 聚焦楠梓
-    loaded = []
-    skipped = []
-    failed = []
+route_group.add_to(m)
 
-    for gpx_file in gpx_files:
-        full_path = os.path.join(folder, gpx_file)
-        if not os.path.exists(full_path):
-            print(f"❌ 找不到 GPX 檔案：{full_path}")
-            failed.append((gpx_file, "找不到檔案"))
-            continue
+# 商家圖層 FeatureGroup
+shop_layer = folium.FeatureGroup(name="📍 開發商家")
 
-        try:
-            with open(full_path, 'r', encoding='utf-8') as f:
-                gpx = gpxpy.parse(f)
+shops_path = os.path.join(folder, "shops.json")
+if os.path.exists(shops_path):
+    with open(shops_path, "r", encoding="utf-8") as f:
+        shops = json.load(f)
+        for shop in shops["features"]:
+            props = shop["properties"]
+            coords = shop["geometry"]["coordinates"]
+            name = props.get("name", "")
+            note = props.get("note", "")
+            emoji = props.get("emoji", "📍")
+            popup_html = f"<b>{emoji} {name}</b><br>{note.replace('
+', '<br>')}"
+            folium.Marker(
+                location=[coords[1], coords[0]],
+                popup=popup_html,
+                tooltip=name,
+                icon=folium.DivIcon(html=f"<div style='font-size:18px;'>{emoji}</div>")
+            ).add_to(shop_layer)
 
-            coords = []
-            for track_seg in gpx.tracks[0].segments:
-                for point in track_seg.points:
-                    if is_in_kaohsiung(point.latitude, point.longitude):
-                        coords.append([point.longitude, point.latitude])
+shop_layer.add_to(m)
 
-            if not coords:
-                skipped.append(gpx_file)
-                continue
+# 加入圖層控制器
+folium.LayerControl(collapsed=False).add_to(m)
 
-            track = {
-                "type": "Feature",
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": coords
-                },
-                "properties": {"name": gpx_file}
-            }
+# 自訂標題
+title_html = f'''
+<h2 style="text-align: center; font-family: 'Noto Sans TC'; margin-top: 1em;">
+  🦍🌏 WorldGym NZXN 每日開發地圖 {folder} 💰
+</h2>
+<div style="text-align: center; margin-bottom: 1em;">
+  <a href="../index.html" style="background-color: #f76775; color: white; padding: 0.5em 1.2em; text-decoration: none; border-radius: 10px; font-weight: bold;">
+    ⬅️ 返回首頁
+  </a>
+</div>
+'''
+m.get_root().html.add_child(folium.Element(title_html))
 
-            folium.GeoJson(track, name=gpx_file, tooltip=gpx_file).add_to(m)
-            loaded.append(gpx_file)
-        except Exception as e:
-            failed.append((gpx_file, str(e)))
-            print(f"❌ 錯誤處理 GPX：{gpx_file} -> {e}")
-
-    # 插入標題與回首頁按鈕
-    title_html = f'''
-    <h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
-      🦍🌍 WorldGym NZXN 每日開發地圖 {folder} 💰
-    </h2>
-    <div style="text-align: center; margin-bottom: 1em;">
-      <a href="../index.html" style="
-        background-color: #ff7675;
-        color: white;
-        padding: 0.5em 1.2em;
-        text-decoration: none;
-        border-radius: 10px;
-        font-family: 'Noto Sans TC', sans-serif;
-        font-weight: bold;
-      ">⬅️ 返回首頁</a>
-    </div>
-    '''
-    m.get_root().html.add_child(folium.Element(title_html))
-    m.get_root().html.add_child(folium.Element('''<link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" />'''))
-    m.get_root().html.add_child(folium.Element('''
-<!-- 插入商家搜尋功能與圖層控制器 -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.css" />
-<script src="https://unpkg.com/leaflet-control-search@2.9.8/dist/leaflet-search.min.js"></script>
-<script>
-setTimeout(() => {
-  const mapObj = window.map || map_a18041249b458e44a073500f354e3cfc;
-  const layer_control = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
-
-  fetch("shops.json")
-    .then(res => res.json())
-    .then(data => {
-      const shopLayer = L.geoJSON(data, {
-        onEachFeature: function (feature, layer) {
-          const name = feature.properties.name || "未知地點";
-          const note = feature.properties.note || "";
-          const emoji = feature.properties.emoji || "📌";
-          const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("
-", "<br>")}`;
-          layer.bindPopup(popup);
-          layer.feature = { properties: { name } };
-        }
-      }).addTo(mapObj);
-
-      layer_control.addOverlay(shopLayer, "🏪 開發商家");
-
-      const searchControl = new L.Control.Search({
-        layer: shopLayer,
-        propertyName: 'name',
-        marker: false,
-        collapsed: false,
-        moveToLocation: function(latlng, title, map) {
-          map.setView(latlng, 17);
-        }
-      });
-      mapObj.addControl(searchControl);
-    });
-}, 500);
-</script>
-'''))
-
-    # 顯示 GPX 載入狀態
-    html = m.get_root().render()
-    html += "<div style='padding:1em;font-family:sans-serif'>"
-    if loaded:
-        html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
-        for f in loaded:
-            html += f"<li>{f}</li>"
-        html += "</ul>"
-    if skipped:
-        html += "<h3>⚠️ 未包含高雄區域的 GPX（已略過）：</h3><ul>"
-        for f in skipped:
-            html += f"<li>{f}</li>"
-        html += "</ul>"
-    if failed:
-        html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
-        for f, err in failed:
-            html += f"<li>{f}<br><code>{err}</code></li>"
-        html += "</ul>"
-    html += "</div>"
-    return html
-
-def update_home_index(months):
-    html = "<h1>🌍🦍 WorldGym 地圖首頁💰</h1><ul>"
-    for m in sorted(months):
-        html += f'<li><a href="{m}/index.html">{m}</a></li>'
-    html += "</ul>"
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
-
-def main():
-    folders = [f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")]
-    generated = []
-    for folder in folders:
-        print(f"📂 處理資料夾：{folder}")
-        gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
-        print(f"🔍 發現 GPX 檔案：{gpx_files}")
-        if not gpx_files:
-            print(f"⚠️ {folder} 中沒有找到 GPX")
-            continue
-        html = generate_leaflet_html(gpx_files, folder)
-        with open(os.path.join(folder, "index.html"), "w", encoding="utf-8") as f:
-            f.write(html)
-        generated.append(folder)
-
-    update_home_index(generated)
-    print("✅ 所有 index.html 重新產生完成")
-
-if __name__ == "__main__":
-    main()
+# 輸出地圖
+m.save(output_file)
+print(f"✅ 地圖已儲存至 {output_file}")
