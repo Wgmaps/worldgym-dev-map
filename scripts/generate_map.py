@@ -1,94 +1,73 @@
 
 import os
 import json
-import folium
 import gpxpy
+import folium
 
-folder = "2025-06"
-center = [22.666, 120.316]
-m = folium.Map(location=center, zoom_start=13, tiles="OpenStreetMap")
+def generate_map(folder):
+    m = folium.Map(location=[22.65, 120.3], zoom_start=13, control_scale=True)
+    layer_control = folium.LayerControl(collapsed=False)
 
-gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
-gpx_files.sort()
-
-loaded, skipped, failed = [], [], []
-
-for gpx_file in gpx_files:
-    try:
-        with open(os.path.join(folder, gpx_file), "r", encoding="utf-8") as f:
+    # 加入所有 GPX 路線
+    gpx_files = sorted([f for f in os.listdir(folder) if f.endswith(".gpx")])
+    for filename in gpx_files:
+        filepath = os.path.join(folder, filename)
+        with open(filepath, "r", encoding="utf-8") as f:
             gpx = gpxpy.parse(f)
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    coords = [(point.latitude, point.longitude) for point in segment.points]
+                    if coords:
+                        folium.PolyLine(coords, tooltip=filename, color="blue").add_to(m)
 
-        coords = []
-        for track in gpx.tracks:
-            for segment in track.segments:
-                for point in segment.points:
-                    coords.append([point.latitude, point.longitude])
+    # 加入圖層控制器
+    layer_control.add_to(m)
 
-        if not coords:
-            skipped.append(gpx_file)
-            continue
+    # 儲存地圖 HTML
+    output_path = os.path.join(folder, "index.html")
+    m.save(output_path)
 
-        track = {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": coords
+    # 插入商家控制器 JS
+    with open(output_path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    insert_script = """
+    <script>
+    setTimeout(() => {
+      const mapObj = window.map || map_a10841249b45be44a073580f354e3cfc;
+      const layerControl = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
+
+      fetch('shops.json')
+        .then(res => res.json())
+        .then(data => {
+          const shopLayer = L.geoJSON(data, {
+            onEachFeature: function (feature, layer) {
+              const name = feature.properties.name || "未命名商家";
+              const note = feature.properties.note || "";
+              const emoji = feature.properties.emoji || "📍";
+              const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("\n", "<br>")}`;
+              layer.bindPopup(popup);
             },
-            "properties": {"name": gpx_file}
-        }
+            pointToLayer: function (feature, latlng) {
+              return L.marker(latlng);
+            }
+          }).addTo(mapObj);
+          layerControl.addOverlay(shopLayer, "📍 開發商家");
+        })
+        .catch(error => {
+          console.error("載入商家圖層失敗：", error);
+        });
+    }, 0);
+    </script>
+    </body>
+    """
 
-        folium.GeoJson(track, name=gpx_file, tooltip=gpx_file).add_to(m)
-        loaded.append(gpx_file)
+    html = html.replace("</body>", insert_script)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html)
 
-    except Exception as e:
-        failed.append((gpx_file, str(e)))
-        print(f"❌ 錯誤處理 GPX：{gpx_file} -> {e}")
+    print(f"✅ 成功產生地圖：{output_path}")
 
-# 插入商家地標
-try:
-    with open(os.path.join(folder, "shops.json"), "r", encoding="utf-8") as f:
-        shop_data = json.load(f)
-
-    def create_popup(feature):
-        name = feature["properties"].get("name", "")
-        note = feature["properties"].get("note", "")
-        return f"<b>📍 {name}</b><br>{note.replace('
-', '<br>')}"
-
-    shop_geojson = {
-        "type": "FeatureCollection",
-        "features": shop_data
-    }
-
-    shop_layer = folium.GeoJson(
-        shop_geojson,
-        name="📌 開發商家",
-        popup=folium.GeoJsonPopup(fields=["name", "note"], aliases=["", ""])
-    )
-    shop_layer.add_to(m)
-
-except Exception as e:
-    print(f"❌ 錯誤處理商家地標: {e}")
-
-# 插入圖層控制器與標題
-folium.LayerControl(collapsed=False).add_to(m)
-
-title_html = f"""
-<h2 style="text-align: center; font-family: 'Noto Sans TC', sans-serif; font-size: 1.8em; margin-top: 1em;">
-    🦍🌏 WorldGym NZXN 每日開發地圖 {folder} 💰
-</h2>
-<div style="text-align: center; margin-bottom: 1em;">
-  <a href="../index.html" style="
-      background-color: #f76767;
-      color: white;
-      padding: 0.5em 1.2em;
-      text-decoration: none;
-      border-radius: 10px;
-      font-family: 'Noto Sans TC', sans-serif;
-      font-weight: bold;
-  ">🔙 返回首頁</a>
-</div>
-"""
-m.get_root().html.add_child(folium.Element(title_html))
-
-m.save(os.path.join(folder, "index.html"))
+# 你可以手動呼叫 generate_map("2025-06")
+if __name__ == "__main__":
+    generate_map("2025-06")
