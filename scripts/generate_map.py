@@ -51,7 +51,7 @@ m.save(os.path.join(gpx_folder, 'index.html'))
 # 新增首頁 index.html
 def generate_homepage():
     folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
-    html = "<h1>🌍🦍 WorldGym 地圖首頁💰</h1><ul>"
+    html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
     for folder in folders:
         html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
     html += "</ul>"
