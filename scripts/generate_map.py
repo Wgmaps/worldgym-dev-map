@@ -46,3 +46,16 @@ except Exception as e:
 # 控制器加入地圖
 folium.LayerControl(collapsed=False).add_to(m)
 m.save(os.path.join(gpx_folder, 'index.html'))
+
+
+# 新增首頁 index.html
+def generate_homepage():
+    folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
+    html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
+    for folder in folders:
+        html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
+    html += "</ul>"
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+generate_homepage()
