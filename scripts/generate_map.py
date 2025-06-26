@@ -4,60 +4,41 @@ import json
 import folium
 import gpxpy
 
-def generate_map(folder):
-    m = folium.Map(location=[22.666, 120.316], zoom_start=13, control_scale=True)
+# 地圖初始化
+m = folium.Map(location=[22.6273, 120.3014], zoom_start=12, control_scale=True)
+layer_control = folium.map.LayerControl(collapsed=False)
+gpx_folder = '2025-06'
+gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
 
-    gpx_files = sorted([f for f in os.listdir(folder) if f.endswith(".gpx")])
-    for filename in gpx_files:
-        path = os.path.join(folder, filename)
-        with open(path, "r", encoding="utf-8") as f:
-            gpx = gpxpy.parse(f)
-            for track in gpx.tracks:
-                for segment in track.segments:
-                    coords = [(pt.latitude, pt.longitude) for pt in segment.points]
-                    if coords:
-                        folium.PolyLine(coords, tooltip=filename, color="blue").add_to(m)
+# GPX 路線圖層
+for gpx_file in sorted(gpx_files):
+    file_path = os.path.join(gpx_folder, gpx_file)
+    with open(file_path, 'r') as f:
+        gpx = gpxpy.parse(f)
+    for track in gpx.tracks:
+        for segment in track.segments:
+            coords = [(point.latitude, point.longitude) for point in segment.points]
+            if coords:
+                folium.PolyLine(coords, color='blue', weight=4.5, opacity=0.8, tooltip=gpx_file).add_to(m)
 
-    folium.LayerControl(collapsed=False).add_to(m)
-    m.save(os.path.join(folder, "index.html"))
+# 商家地標圖層
+try:
+    with open(os.path.join(gpx_folder, 'shops.json'), 'r', encoding='utf-8') as f:
+        shop_data = json.load(f)
 
-    # 插入商家控制器 script
-    html_path = os.path.join(folder, "index.html")
-    with open(html_path, "r", encoding="utf-8") as f:
-        html = f.read()
+    shop_group = folium.FeatureGroup(name='📍開發商家', show=True)
+    for feature in shop_data['features']:
+        props = feature['properties']
+        lat, lon = feature['geometry']['coordinates'][1], feature['geometry']['coordinates'][0]
+        name = props.get('name', '未命名')
+        note = props.get('note', '')
+        emoji = props.get('emoji', '📍')
+        popup = folium.Popup(f"<b>{emoji} {name}</b><br>{note}", max_width=300)
+        folium.Marker(location=[lat, lon], popup=popup, icon=folium.Icon(color='red', icon='info-sign')).add_to(shop_group)
+    shop_group.add_to(m)
+except Exception as e:
+    print(f"⚠️ 無法載入商家資料: {e}")
 
-    script_block = """
-<script>
-setTimeout(() => {
-  const mapObj = window.map || map_a10841249b45be44a073580f354e3cfc;
-  const layerControl = L.control.layers({}, {}, { collapsed: false }).addTo(mapObj);
-  fetch('shops.json')
-    .then(res => res.json())
-    .then(data => {
-      const shopLayer = L.geoJSON(data, {
-        onEachFeature: function (feature, layer) {
-          const name = feature.properties.name || "未命名商家";
-          const note = feature.properties.note || "";
-          const emoji = feature.properties.emoji || "📍";
-          const popup = `<b>${emoji} ${name}</b><br>${note.replaceAll("\n", "<br>")}`;
-          layer.bindPopup(popup);
-        },
-        pointToLayer: function (feature, latlng) {
-          return L.marker(latlng);
-        }
-      }).addTo(mapObj);
-      layerControl.addOverlay(shopLayer, "📍 開發商家");
-    });
-}, 0);
-</script>
-</body>
-"""
-
-    html = html.replace("</body>", script_block)
-    with open(html_path, "w", encoding="utf-8") as f:
-        f.write(html)
-
-    print(f"✅ 已產生地圖與商家圖層控制器：{html_path}")
-
-if __name__ == "__main__":
-    generate_map("2025-06")
+# 控制器加入地圖
+layer_control.add_to(m)
+m.save(os.path.join(gpx_folder, 'index.html'))
