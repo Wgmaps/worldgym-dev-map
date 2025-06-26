@@ -1,64 +1,82 @@
+
 import os
-import json
 import folium
 import gpxpy
+import json
 
-# 設定目前資料夾
-folder = "2025-06"
-output_file = os.path.join(folder, "index.html")
-shops_file = "shops.json"
+gpx_folder = '2025-06'
+shops_file = 'shops.json'
 
-# 初始化地圖
-m = folium.Map(location=[22.6273, 120.3014], zoom_start=12, control_scale=True)
+map_center = [22.65, 120.3]
+m = folium.Map(location=map_center, zoom_start=13, tiles='openstreetmap')
 
-# 圖層：開發路線（GPX）
-staff_layer = folium.FeatureGroup(name="👟 員工開發路線", show=True)
+# 所有 GPX 圖層與 FeatureGroup（用於控制器）
+gpx_layer_group = folium.FeatureGroup(name="所有 GPX 路線", show=True)
+employee_layer_group = folium.FeatureGroup(name="👟 員工開發路線", show=True)
 
-# GPX 檔案處理
-for file in sorted(os.listdir(folder)):
-    if file.endswith(".gpx"):
-        path = os.path.join(folder, file)
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                gpx = gpxpy.parse(f)
-                for track in gpx.tracks:
-                    for segment in track.segments:
-                        coords = [(point.latitude, point.longitude) for point in segment.points]
-                        if coords:
-                            geojson = folium.PolyLine(
-                                coords,
-                                color='blue',
-                                weight=4,
-                                opacity=0.8,
-                                tooltip=file
-                            )
-                            staff_layer.add_child(geojson)
-        except Exception as e:
-            print(f"❌ 錯誤讀取 GPX {file}: {e}")
+loaded_files = []
+skipped_files = []
+failed_files = []
 
-m.add_child(staff_layer)
+for filename in os.listdir(gpx_folder):
+    if not filename.endswith('.gpx'):
+        continue
+    filepath = os.path.join(gpx_folder, filename)
+    try:
+        with open(filepath, 'r', encoding='utf-8') as gpx_file:
+            gpx = gpxpy.parse(gpx_file)
 
-# 圖層：商家位置
-if os.path.exists(shops_file):
-    shop_layer = folium.FeatureGroup(name="📍 開發商家", show=True)
+        coords = []
+        for track in gpx.tracks:
+            for segment in track.segments:
+                for point in segment.points:
+                    coords.append((point.latitude, point.longitude))
+
+        if not coords:
+            skipped_files.append(filename)
+            continue
+
+        layer = folium.PolyLine(locations=coords, color='blue', weight=3, opacity=0.8)
+        layer.add_to(gpx_layer_group)
+
+        if 'ben' in filename.lower():
+            # 員工開發路線的判斷依照檔名含 ben
+            layer.add_to(employee_layer_group)
+
+        loaded_files.append(filename)
+    except Exception as e:
+        failed_files.append((filename, str(e)))
+
+# 加入 GPX 圖層群組到地圖
+gpx_layer_group.add_to(m)
+employee_layer_group.add_to(m)
+
+# 加入商家地標（shops.json）
+try:
     with open(shops_file, 'r', encoding='utf-8') as f:
-        shops = json.load(f)
-        for shop in shops:
-            lat = shop.get("lat")
-            lon = shop.get("lng")
-            name = shop.get("name", "")
-            note = shop.get("note", "")
-            if lat and lon:
-                folium.Marker(
-                    location=[lat, lon],
-                    icon=folium.DivIcon(html='📍'),
-                    tooltip=f"{name} - {note}" if note else name
-                ).add_to(shop_layer)
-    m.add_child(shop_layer)
+        shop_data = json.load(f)
+
+    shop_group = folium.FeatureGroup(name="📍 商家地標", show=True)
+
+    for feature in shop_data["features"]:
+        prop = feature["properties"]
+        coords = feature["geometry"]["coordinates"]
+        name = prop.get("name", "商家")
+        note = prop.get("note", "")
+        popup = f"{name}<br>{note}" if note else name
+        folium.Marker(
+            location=[coords[1], coords[0]],
+            icon=folium.DivIcon(html='<div style="font-size:20px;">📍</div>'),
+            popup=popup
+        ).add_to(shop_group)
+
+    shop_group.add_to(m)
+except Exception as e:
+    print(f"❌ 無法載入 shops.json：{e}")
 
 # 加入圖層控制器
 folium.LayerControl(collapsed=False).add_to(m)
 
-# 輸出 HTML
-m.save(output_file)
-print(f"✅ 地圖已產生：{output_file}")
+# 儲存
+m.save(os.path.join(gpx_folder, 'index.html'))
+print("✅ 地圖已更新，共載入 GPX：", len(loaded_files), "略過：", len(skipped_files), "錯誤：", len(failed_files))
