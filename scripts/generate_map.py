@@ -1,73 +1,61 @@
+
 import os
 import json
 import folium
-from folium.plugins import Fullscreen
 import gpxpy
-from datetime import datetime
-from pathlib import Path
 
-def load_shops(json_path):
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"⚠️ 無法讀取 {json_path}: {e}")
-        return []
+# 地圖初始化
+m = folium.Map(location=[22.6273, 120.3014], zoom_start=12, control_scale=True)
 
-def parse_gpx(file_path):
-    try:
-        with open(file_path, 'r', encoding='utf-8') as gpx_file:
-            return gpxpy.parse(gpx_file)
-    except Exception as e:
-        print(f"⚠️ GPX 解析錯誤 {file_path}: {e}")
-        return None
+gpx_folder = '2025-06'
+gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
 
-def create_monthly_map(folder):
-    month_map = folium.Map(location=[22.626, 120.315], zoom_start=13, tiles='OpenStreetMap')
-    Fullscreen(position='topright').add_to(month_map)
+# GPX 路線圖層群組
+track_group = folium.FeatureGroup(name='🚴‍♂️員工開發路線', show=True)
 
-    shop_path = folder / "shops.json"
-    shops = load_shops(shop_path)
+for gpx_file in sorted(gpx_files):
+    file_path = os.path.join(gpx_folder, gpx_file)
+    with open(file_path, 'r') as f:
+        gpx = gpxpy.parse(f)
+    for track in gpx.tracks:
+        for segment in track.segments:
+            coords = [(point.latitude, point.longitude) for point in segment.points]
+            if coords:
+                folium.PolyLine(coords, color='blue', weight=4.5, opacity=0.8, tooltip=gpx_file).add_to(track_group)
 
-    shop_group = folium.FeatureGroup(name="🏪 商家地標", show=True)
-    for shop in shops:
-        try:
-            lat = float(shop["lat"])
-            lng = float(shop["lng"])
-            name = shop["店家名稱"]
-            address = shop["地址"]
-            staff = shop.get("負責", "未知")
-            popup = f"<b>{name}</b><br>{address}<br>負責人：{staff}"
-            folium.Marker(location=[lat, lng], popup=popup, icon=folium.Icon(color="green")).add_to(shop_group)
-        except Exception as e:
-            print(f"⚠️ 無法新增商家地標: {shop} - {e}")
-    shop_group.add_to(month_map)
+track_group.add_to(m)
 
-    gpx_group = folium.FeatureGroup(name="📍 全部開發路線", show=True)
-    for file in sorted(folder.glob("*.gpx")):
-        gpx = parse_gpx(file)
-        if not gpx:
-            continue
-        coords = []
-        for track in gpx.tracks:
-            for segment in track.segments:
-                for point in segment.points:
-                    coords.append((point.latitude, point.longitude))
-        if coords:
-            folium.PolyLine(locations=coords, weight=5, color='blue', opacity=0.6, tooltip=file.name).add_to(gpx_group)
-    gpx_group.add_to(month_map)
+# 商家地標圖層
+try:
+    with open(os.path.join(gpx_folder, 'shops.json'), 'r', encoding='utf-8') as f:
+        shop_data = json.load(f)
 
-    folium.LayerControl(collapsed=False).add_to(month_map)
+    shop_group = folium.FeatureGroup(name='📍開發商家', show=True)
+    for feature in shop_data['features']:
+        props = feature['properties']
+        lat, lon = feature['geometry']['coordinates'][1], feature['geometry']['coordinates'][0]
+        name = props.get('name', '未命名')
+        note = props.get('note', '')
+        emoji = props.get('emoji', '📍')
+        popup = folium.Popup(f"<b>{emoji} {name}</b><br>{note}", max_width=300)
+        folium.Marker(location=[lat, lon], popup=popup, icon=folium.Icon(color='red', icon='info-sign')).add_to(shop_group)
+    shop_group.add_to(m)
+except Exception as e:
+    print(f"⚠️ 無法載入商家資料: {e}")
 
-    output_path = folder / "index.html"
-    month_map.save(output_path)
-    print(f"✅ 地圖已輸出到 {output_path}")
+# 控制器加入地圖
+folium.LayerControl(collapsed=False).add_to(m)
+m.save(os.path.join(gpx_folder, 'index.html'))
 
-def generate_all_maps():
-    root = Path(".")
-    for folder in sorted(root.iterdir()):
-        if folder.is_dir() and folder.name.startswith("2025-"):
-            create_monthly_map(folder)
 
-if __name__ == "__main__":
-    generate_all_maps()
+# 新增首頁 index.html
+def generate_homepage():
+    folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
+    html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
+    for folder in folders:
+        html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
+    html += "</ul>"
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+generate_homepage()
