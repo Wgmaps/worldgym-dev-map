@@ -1,54 +1,50 @@
+import re
 
-import os
-import json
-from pathlib import Path
-import folium
-from folium.plugins import MarkerCluster
-from gpxpy import parse as parse_gpx
-
-# 自動取得目前資料夾名稱作為地圖標題
 root = Path(".")
-current_folder = next(p for p in root.iterdir() if p.is_dir() and p.name.startswith("2025-"))
-year_month = current_folder.name
+month_folders = sorted([f for f in root.iterdir() if f.is_dir() and re.match(r"^\d{4}-\d{2}$", f.name)])
 
-# 建立地圖
-m = folium.Map(location=[22.63, 120.3], zoom_start=13, control_scale=True)
+for folder in month_folders:
+    print(f"📍 正在處理資料夾：{folder}")
+    gpx_files = list(folder.glob("*.gpx"))
+    shops_file = folder / "shops.json"
+    output_html = folder / "index.html"
 
-# 加入圖層控制
-gpx_layer = folium.FeatureGroup(name="📍員工開發路線", show=True)
-m.add_child(gpx_layer)
+    if not gpx_files:
+        print(f"⚠️ 沒有找到 GPX 檔案，跳過 {folder}")
+        continue
 
-# GPX 檔案處理
-for gpx_file in sorted(current_folder.glob("*.gpx")):
-    with open(gpx_file, "r", encoding="utf-8") as f:
-        gpx = parse_gpx(f.read())
-        for track in gpx.tracks:
-            for segment in track.segments:
-                points = [[p.latitude, p.longitude] for p in segment.points]
-                folium.PolyLine(points, color="blue", weight=4).add_to(gpx_layer)
+    # Map init
+    from folium import Map, LayerControl, FeatureGroup, Marker, GeoJson
+    import json
+    import gpxpy
+    import folium
 
-# 商家地標
-shops_path = current_folder / "shops.json"
-if shops_path.exists():
-    with open(shops_path, "r", encoding="utf-8") as f:
-        shops = json.load(f)
-    shop_layer = folium.FeatureGroup(name="🏪 商家地標", show=True)
-    for shop in shops:
-        if isinstance(shop, dict):
-            location = [shop["lat"], shop["lng"]]
-            name = shop.get("name", "")
-            note = shop.get("note", "")
-            folium.Marker(
-                location,
-                icon=folium.DivIcon(html=f"<div style='font-size: 24px;'>📍</div>"),
-                tooltip=f"{name} ({note})"
-            ).add_to(shop_layer)
-    m.add_child(shop_layer)
+    m = Map(location=[22.626, 120.301], zoom_start=13, control_scale=True)
 
-# 圖層控制器
-folium.LayerControl(position="topright").add_to(m)
+    # 加入 GPX 路線
+    gpx_group = FeatureGroup(name="📍員工開發路線", show=True)
+    for gpx_file in gpx_files:
+        with open(gpx_file, "r", encoding="utf-8") as f:
+            gpx = gpxpy.parse(f)
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    coords = [(point.latitude, point.longitude) for point in segment.points]
+                    if coords:
+                        folium.PolyLine(coords, color="blue", weight=3).add_to(gpx_group)
+    gpx_group.add_to(m)
 
-# 匯出地圖 HTML
-output_path = current_folder / "index.html"
-m.save(str(output_path))
-print(f"✔ 地圖已輸出到 {output_path}")
+    # 加入商家地標
+    if shops_file.exists():
+        shop_group = FeatureGroup(name="🏪 商家地標", show=True)
+        with open(shops_file, "r", encoding="utf-8") as f:
+            shops = json.load(f)
+            for shop in shops:
+                location = [shop["lat"], shop["lng"]]
+                text = shop.get("name", "")
+                Marker(location=location, tooltip=f"📍 {text}").add_to(shop_group)
+        shop_group.add_to(m)
+
+    LayerControl(collapsed=False).add_to(m)
+    m.save(str(output_html))
+    print(f"✅ 地圖已輸出：{output_html}")
+exit(0)
