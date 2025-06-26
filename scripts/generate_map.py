@@ -1,58 +1,44 @@
 
-from pathlib import Path
+import os
 import json
-import gpxpy
 import folium
+import gpxpy
 
-# 地圖初始化（中心座標設為高雄）
-m = folium.Map(location=[22.6273, 120.3014], zoom_start=12)
+# 地圖初始化
+m = folium.Map(location=[22.6273, 120.3014], zoom_start=12, control_scale=True)
+layer_control = folium.map.LayerControl(collapsed=False)
+gpx_folder = '2025-06'
+gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
 
-# ---------- 商家圖層 ----------
-shops_file = Path("shops.json")
-if shops_file.exists():
-    with open(shops_file, "r", encoding="utf-8") as f:
-        shops = json.load(f)
-    shop_layer = folium.FeatureGroup(name="📍 商家地標", show=True)
-    for shop in shops:
-        name = shop.get("name", "無名稱")
-        note = shop.get("note", "")
-        lat = shop.get("lat")
-        lon = shop.get("lon")
-        if lat and lon:
-            folium.Marker(
-                location=[lat, lon],
-                popup=f"{name}<br>{note}",
-                tooltip=name,
-                icon=folium.Icon(color="red", icon="info-sign"),
-            ).add_to(shop_layer)
-    shop_layer.add_to(m)
+# GPX 路線圖層
+for gpx_file in sorted(gpx_files):
+    file_path = os.path.join(gpx_folder, gpx_file)
+    with open(file_path, 'r') as f:
+        gpx = gpxpy.parse(f)
+    for track in gpx.tracks:
+        for segment in track.segments:
+            coords = [(point.latitude, point.longitude) for point in segment.points]
+            if coords:
+                folium.PolyLine(coords, color='blue', weight=4.5, opacity=0.8, tooltip=gpx_file).add_to(m)
 
-# ---------- GPX 路線圖層 ----------
-gpx_dir = Path(".")
-gpx_files = list(gpx_dir.glob("*.gpx"))
-gpx_layer = folium.FeatureGroup(name="🛤️ 開發路線", show=True)
+# 商家地標圖層
+try:
+    with open(os.path.join(gpx_folder, 'shops.json'), 'r', encoding='utf-8') as f:
+        shop_data = json.load(f)
 
-for gpx_file in gpx_files:
-    try:
-        with open(gpx_file, "r", encoding="utf-8") as f:
-            gpx = gpxpy.parse(f)
-        for track in gpx.tracks:
-            for segment in track.segments:
-                coords = [(point.latitude, point.longitude) for point in segment.points]
-                folium.PolyLine(
-                    locations=coords,
-                    color="blue",
-                    weight=3,
-                    opacity=0.7,
-                    popup=str(gpx_file.name),
-                ).add_to(gpx_layer)
-    except Exception as e:
-        print(f"❌ 無法載入 {gpx_file.name}: {e}")
+    shop_group = folium.FeatureGroup(name='📍開發商家', show=True)
+    for feature in shop_data['features']:
+        props = feature['properties']
+        lat, lon = feature['geometry']['coordinates'][1], feature['geometry']['coordinates'][0]
+        name = props.get('name', '未命名')
+        note = props.get('note', '')
+        emoji = props.get('emoji', '📍')
+        popup = folium.Popup(f"<b>{emoji} {name}</b><br>{note}", max_width=300)
+        folium.Marker(location=[lat, lon], popup=popup, icon=folium.Icon(color='red', icon='info-sign')).add_to(shop_group)
+    shop_group.add_to(m)
+except Exception as e:
+    print(f"⚠️ 無法載入商家資料: {e}")
 
-gpx_layer.add_to(m)
-
-# ---------- 控制器 ----------
-folium.LayerControl(collapsed=False).add_to(m)
-
-# ---------- 輸出 HTML ----------
-m.save("index.html")
+# 控制器加入地圖
+layer_control.add_to(m)
+m.save(os.path.join(gpx_folder, 'index.html'))
