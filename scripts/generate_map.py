@@ -1,90 +1,54 @@
+
 import os
 import json
-import folium
 from pathlib import Path
+import folium
+from folium.plugins import MarkerCluster
+from gpxpy import parse as parse_gpx
 
-year_month_dirs = sorted([
-    d for d in os.listdir(".")
-    if os.path.isdir(d) and d.startswith("2025-")
-])
+# 自動取得目前資料夾名稱作為地圖標題
+root = Path(".")
+current_folder = next(p for p in root.iterdir() if p.is_dir() and p.name.startswith("2025-"))
+year_month = current_folder.name
 
-index_html = """<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8" />
-    <title>WorldGym NZXN 每日開發地圖</title>
-    <style>
-        body { font-family: 'Noto Sans TC', sans-serif; text-align: center; background: #f5f5f5; }
-        h1 { margin-top: 40px; }
-        .container { display: flex; flex-wrap: wrap; justify-content: center; margin: 40px auto; max-width: 1000px; }
-        .card {
-            background: white; padding: 20px; margin: 10px; border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 200px; text-align: center;
-        }
-        a { text-decoration: none; color: #333; font-weight: bold; }
-    </style>
-</head>
-<body>
-    <h1>📍 WorldGym NZXN 每月開發地圖 📍</h1>
-    <div class="container">
-"""
+# 建立地圖
+m = folium.Map(location=[22.63, 120.3], zoom_start=13, control_scale=True)
 
-for folder in year_month_dirs:
-    folder_path = Path(folder)
-    gpx_files = list(folder_path.glob("*.gpx"))
-    if gpx_files:
-        index_html += f'<div class="card"><a href="{folder}/index.html">{folder}</a></div>\n'
+# 加入圖層控制
+gpx_layer = folium.FeatureGroup(name="📍員工開發路線", show=True)
+m.add_child(gpx_layer)
 
-index_html += """
-    </div>
-    <p style="margin-top: 50px; color: #777;">更新時間：自動同步 GitHub</p>
-</body>
-</html>
-"""
+# GPX 檔案處理
+for gpx_file in sorted(current_folder.glob("*.gpx")):
+    with open(gpx_file, "r", encoding="utf-8") as f:
+        gpx = parse_gpx(f.read())
+        for track in gpx.tracks:
+            for segment in track.segments:
+                points = [[p.latitude, p.longitude] for p in segment.points]
+                folium.PolyLine(points, color="blue", weight=4).add_to(gpx_layer)
 
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(index_html)
-
-# 處理每個月資料夾
-for folder in year_month_dirs:
-    gpx_files = sorted([
-        f for f in os.listdir(folder)
-        if f.endswith(".gpx")
-    ])
-    if not gpx_files:
-        continue
-
-    m = folium.Map(location=[22.6268, 120.3089], zoom_start=13, tiles="openstreetmap")
-    feature_group = folium.FeatureGroup(name="員工開發路線", show=True)
-    for gpx in gpx_files:
-        gpx_path = os.path.join(folder, gpx)
-        try:
-            import gpxpy
-            with open(gpx_path, "r") as f:
-                gpx_obj = gpxpy.parse(f)
-                for track in gpx_obj.tracks:
-                    for segment in track.segments:
-                        coords = [(p.latitude, p.longitude) for p in segment.points]
-                        folium.PolyLine(coords, color="blue", weight=4, opacity=0.7,
-                                        tooltip=gpx).add_to(feature_group)
-        except Exception as e:
-            print(f"Error loading {gpx}: {e}")
-    feature_group.add_to(m)
-
-    # 商家圖層
-    shops_path = os.path.join(folder, "shops.json")
-    if os.path.exists(shops_path):
-        with open(shops_path, "r", encoding="utf-8") as f:
-            shops = json.load(f)
-
-        shop_layer = folium.FeatureGroup(name="商家地標", show=True)
-        for shop in shops:
+# 商家地標
+shops_path = current_folder / "shops.json"
+if shops_path.exists():
+    with open(shops_path, "r", encoding="utf-8") as f:
+        shops = json.load(f)
+    shop_layer = folium.FeatureGroup(name="🏪 商家地標", show=True)
+    for shop in shops:
+        if isinstance(shop, dict):
+            location = [shop["lat"], shop["lng"]]
+            name = shop.get("name", "")
+            note = shop.get("note", "")
             folium.Marker(
-                location=[shop["lat"], shop["lng"]],
-                popup=f'📍 {shop["name"]} ({shop["note"]})',
-                icon=folium.Icon(color="red", icon="info-sign")
+                location,
+                icon=folium.DivIcon(html=f"<div style='font-size: 24px;'>📍</div>"),
+                tooltip=f"{name} ({note})"
             ).add_to(shop_layer)
-        shop_layer.add_to(m)
+    m.add_child(shop_layer)
 
-    folium.LayerControl(collapsed=False).add_to(m)
-    m.save(os.path.join(folder, "index.html"))
+# 圖層控制器
+folium.LayerControl(position="topright").add_to(m)
+
+# 匯出地圖 HTML
+output_path = current_folder / "index.html"
+m.save(str(output_path))
+print(f"✔ 地圖已輸出到 {output_path}")
