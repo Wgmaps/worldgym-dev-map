@@ -25,6 +25,7 @@ def generate_map_for_folder(gpx_folder):
     m.get_root().html.add_child(folium.Element(title_html))
 
     loaded_routes = []
+    gpx_status_html = ""
     skipped = []
     failed = []
     skipped = []
