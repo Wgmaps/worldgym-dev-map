@@ -26,6 +26,8 @@ def generate_map_for_folder(gpx_folder):
 
     loaded_routes = []
     skipped = []
+    failed = []
+    skipped = []
 
     for gpx_file in sorted(gpx_files):
         file_path = os.path.join(gpx_folder, gpx_file)
