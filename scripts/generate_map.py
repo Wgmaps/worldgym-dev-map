@@ -70,29 +70,9 @@ def generate_map_for_folder(gpx_folder):
     if loaded_routes:
         gpx_list_html = "<div style='padding:10px;font-size:14px'><b>✅ 已成功載入以下 GPX 檔案：</b><ul>"
         for _, name in loaded_routes:
-            gpx_list_html += f"<li>・{name}</li>"
-        gpx_list_html += "</ul></div>"
-        m.get_root().html.add_child(folium.Element(gpx_list_html))
-
     # 顯示 GPX 載入狀態（成功、略過、失敗）
     gpx_status_html = "<div style='padding:1em;font-family:sans-serif'>"
     if loaded_routes:
-        gpx_status_html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
-        for _, name in loaded_routes:
-            gpx_status_html += f"<li>{name}</li>"
-        gpx_status_html += "</ul>"
-    if skipped:
-        gpx_status_html += "<h3>⚠️ 未包含高雄區域的 GPX（已略過）：</h3><ul>"
-        for name in skipped:
-            gpx_status_html += f"<li>{name}</li>"
-        gpx_status_html += "</ul>"
-    if failed:
-        gpx_status_html += "<h3>❌ 載入失敗的 GPX：</h3><ul>"
-        for name, err in failed:
-            gpx_status_html += f"<li>{name}<br><code>{err}</code></li>"
-        gpx_status_html += "</ul>"
-    gpx_status_html += "</div>"
-
     m.get_root().html.add_child(folium.Element(gpx_status_html))
     m.save(os.path.join(gpx_folder, "index.html"))
     print(f"✅ 已產出 {gpx_folder}/index.html")
@@ -105,9 +85,4 @@ for folder in folders:
 def generate_homepage():
     html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
     for folder in folders:
-        html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
-    html += "</ul>"
-    with open("index.html", "w", encoding="utf-8") as f:
-        f.write(html)
-
 generate_homepage()
