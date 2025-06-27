@@ -43,6 +43,10 @@ def generate_map_for_folder(gpx_folder):
             print(f"❌ 無法讀取 {gpx_file}: {e}")
 
     if loaded_routes:
+        gpx_status_html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
+        for _, name in loaded_routes:
+            gpx_status_html += f"<li>{name}</li>"
+        gpx_status_html += "</ul>"
         track_group = folium.FeatureGroup(name="🚴‍♂️員工開發路線", show=True)
         for coords, name in loaded_routes:
             folium.PolyLine(coords, color="blue", weight=4.5, opacity=0.8, tooltip=name).add_to(track_group)
@@ -68,11 +72,18 @@ def generate_map_for_folder(gpx_folder):
 
     # 顯示已成功載入的 GPX 檔案清單
     if loaded_routes:
-        gpx_list_html = "<div style='padding:10px;font-size:14px'><b>✅ 已成功載入以下 GPX 檔案：</b><ul>"
+        gpx_status_html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
         for _, name in loaded_routes:
+            gpx_status_html += f"<li>{name}</li>"
+        gpx_status_html += "</ul>"
+        gpx_list_html = "<div style='padding:10px;font-size:14px'><b>✅ 已成功載入以下 GPX 檔案：</b><ul>"
     # 顯示 GPX 載入狀態（成功、略過、失敗）
     gpx_status_html = "<div style='padding:1em;font-family:sans-serif'>"
     if loaded_routes:
+        gpx_status_html += "<h3>✅ 載入成功的 GPX：</h3><ul>"
+        for _, name in loaded_routes:
+            gpx_status_html += f"<li>{name}</li>"
+        gpx_status_html += "</ul>"
     m.get_root().html.add_child(folium.Element(gpx_status_html))
     m.save(os.path.join(gpx_folder, "index.html"))
     print(f"✅ 已產出 {gpx_folder}/index.html")
