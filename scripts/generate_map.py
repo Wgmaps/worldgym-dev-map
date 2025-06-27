@@ -96,4 +96,7 @@ for folder in folders:
 def generate_homepage():
     html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
     for folder in folders:
-generate_homepage()
+        html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
+    html += "</ul>"
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
