@@ -25,6 +25,7 @@ def generate_map_for_folder(gpx_folder):
     m.get_root().html.add_child(folium.Element(title_html))
 
     loaded_routes = []
+    skipped = []
 
     for gpx_file in sorted(gpx_files):
         file_path = os.path.join(gpx_folder, gpx_file)
