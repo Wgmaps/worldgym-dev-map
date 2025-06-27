@@ -1,84 +1,81 @@
 
 import os
-import glob
+import json
 import folium
-from folium.plugins import BeautifyIcon
 import gpxpy
-from datetime import datetime
 
-def generate_map_for_folder(folder):
-    m = folium.Map(location=[22.729, 120.327], zoom_start=13)
-    gpx_status_html = "<h3>✅ 載入成功的 GPX：</h3><ul>"
-    feature_groups = {}
+# 自動處理所有月份資料夾
+folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
 
-    shops_file = os.path.join(folder, "shops.txt")
-    if os.path.exists(shops_file):
-        with open(shops_file, "r", encoding="utf-8") as f:
-            for line in f:
-                parts = line.strip().split(",")
-                if len(parts) >= 3:
-                    lat, lon, name = parts[0], parts[1], ",".join(parts[2:])
-                    folium.Marker(
-                        location=[float(lat), float(lon)],
-                        popup=name,
-                        icon=BeautifyIcon(
-                            icon="store",
-                            border_color="#FF0000",
-                            text_color="#FF0000",
-                            background_color="#FFF0F0",
-                            number=chr(9733)
-                        )
-                    ).add_to(m)
+def generate_map_for_folder(gpx_folder):
+    print(f"📍 處理資料夾：{gpx_folder}")
+    m = folium.Map(location=[22.7279, 120.3285], zoom_start=13, control_scale=True)
 
-    gpx_files = sorted(glob.glob(os.path.join(folder, "*.gpx")))
-    for gpx_file in gpx_files:
-        try:
-            with open(gpx_file, "r", encoding="utf-8") as f:
-                gpx = gpxpy.parse(f)
-                coords = [(point.latitude, point.longitude) for track in gpx.tracks for segment in track.segments for point in segment.points]
-                if coords:
-                    name = os.path.basename(gpx_file)
-                    fg = folium.FeatureGroup(name=name)
-                    folium.PolyLine(coords, color="blue", weight=3, opacity=0.7, tooltip=name).add_to(fg)
-                    fg.add_to(m)
-                    feature_groups[name] = fg
-                    gpx_status_html += f"<li>{name}</li>"
-        except Exception as e:
-            print(f"❌ Failed to load {gpx_file}: {e}")
+    gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
 
-    gpx_status_html += "</ul>"
-
-    folium.LayerControl().add_to(m)
-    gpx_status_element = folium.Element(gpx_status_html)
-    m.get_root().html.add_child(gpx_status_element)
-
-    title_html = '''
-        <h2 style="position:fixed;top:10px;left:10px;z-index:9999;
-            background:white;padding:5px 10px;border-radius:5px;">
-            🦍🌍 WorldGym NZXN 每日開發地圖 2025-06 💰
-            <a href="../index.html" style="margin-left:20px;">
-                <button style="background:red;color:white;">返回首頁</button>
-            </a>
-        </h2>
-    '''
+    # 加上開頭 HTML 標題與返回首頁
+    title_html = f'''
+         <h3 align="center" style="font-size:24px">
+         🦍🌍 WorldGym NZXN 每日開發地圖 {gpx_folder} 💰
+         </h3>
+         <div style="text-align:center;margin-bottom:10px;">
+         <a href="../index.html"><button style="background-color:red;color:white;border:none;padding:5px 10px;border-radius:5px;">返回首頁</button></a>
+         </div>
+     '''
     m.get_root().html.add_child(folium.Element(title_html))
 
-    map_file = os.path.join(folder, "index.html")
-    m.save(map_file)
+    loaded_routes = []
 
+    for gpx_file in sorted(gpx_files):
+        file_path = os.path.join(gpx_folder, gpx_file)
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                gpx = gpxpy.parse(f)
+            for track in gpx.tracks:
+                for segment in track.segments:
+                    coords = [(point.latitude, point.longitude) for point in segment.points]
+                    if coords:
+                        loaded_routes.append((coords, gpx_file))
+        except Exception as e:
+            print(f"❌ 無法讀取 {gpx_file}: {e}")
+
+    if loaded_routes:
+        track_group = folium.FeatureGroup(name="🚴‍♂️員工開發路線", show=True)
+        for coords, name in loaded_routes:
+            folium.PolyLine(coords, color="blue", weight=4.5, opacity=0.8, tooltip=name).add_to(track_group)
+        track_group.add_to(m)
+
+    try:
+        with open(os.path.join(gpx_folder, "shops.json"), "r", encoding="utf-8") as f:
+            shop_data = json.load(f)
+        shop_group = folium.FeatureGroup(name="📍開發商家", show=True)
+        for feature in shop_data["features"]:
+            props = feature["properties"]
+            lat, lon = feature["geometry"]["coordinates"][1], feature["geometry"]["coordinates"][0]
+            name = props.get("name", "未命名")
+            note = props.get("note", "")
+            emoji = props.get("emoji", "📍")
+            popup = folium.Popup(f"<b>{emoji} {name}</b><br>{note}", max_width=300)
+            folium.Marker(location=[lat, lon], popup=popup, icon=folium.Icon(color="red", icon="info-sign")).add_to(shop_group)
+        shop_group.add_to(m)
+    except Exception as e:
+        print(f"⚠️ 無法載入商家資料: {e}")
+
+    folium.LayerControl(collapsed=False).add_to(m)
+    m.save(os.path.join(gpx_folder, "index.html"))
+    print(f"✅ 已產出 {gpx_folder}/index.html")
+
+# 為每個資料夾產生地圖
+for folder in folders:
+    generate_map_for_folder(folder)
+
+# 建立首頁 index.html
 def generate_homepage():
-    folders = sorted([f for f in os.listdir("docs") if os.path.isdir(os.path.join("docs", f))])
-    homepage_html = "<h1>WorldGym NZXN 每日開發地圖</h1><ul>"
+    html = "<h1>🌍 WorldGym 地圖首頁</h1><ul>"
     for folder in folders:
-        homepage_html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
-    homepage_html += "</ul>"
+        html += f'<li><a href="{folder}/index.html">{folder}</a></li>'
+    html += "</ul>"
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
 
-    with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(homepage_html)
-
-if __name__ == "__main__":
-    for folder in sorted(os.listdir("docs")):
-        full_path = os.path.join("docs", folder)
-        if os.path.isdir(full_path):
-            generate_map_for_folder(full_path)
-    generate_homepage()
+generate_homepage()
