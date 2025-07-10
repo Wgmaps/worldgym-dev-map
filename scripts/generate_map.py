@@ -9,8 +9,8 @@ import json
 folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
 
 def extract_name(filename):
-    name_part = re.sub(r'^\d{4}_', '', filename)         # 移除日期
-    name_part = re.sub(r'\d*(?=\.gpx$)', '', name_part)  # 移除名字後的數字
+    name_part = re.sub(r'^\d{4}_', '', filename)
+    name_part = re.sub(r'\d*(?=\.gpx$)', '', name_part)
     name_part = name_part.replace('.gpx', '')
     return name_part
 
@@ -18,7 +18,6 @@ def generate_map_for_folder(gpx_folder):
     print(f"📍 處理資料夾：{gpx_folder}")
     m = folium.Map(location=[22.6273, 120.3014], zoom_start=13, control_scale=True)
 
-    # 返回首頁按鈕
     title_html = f'''
          <h3 align="center" style="font-size:24px">
          🦍🌍 WorldGym NZXN 每日開發地圖 {gpx_folder} 💰
@@ -29,26 +28,31 @@ def generate_map_for_folder(gpx_folder):
      '''
     m.get_root().html.add_child(folium.Element(title_html))
 
-    # 特約商家圖層
     merchant_layer = folium.FeatureGroup(name='🏪 特約商家')
     m.add_child(merchant_layer)
 
-    # 嘗試載入 shops.json
+    # 載入商家地標 (GeoJSON 格式)
     shops_file = os.path.join(gpx_folder, 'shops.json')
     if os.path.exists(shops_file):
         with open(shops_file, 'r', encoding='utf-8') as f:
-            shops_data = json.load(f)
-            for shop in shops_data:
-                lat = shop.get('lat')
-                lon = shop.get('lon')
-                name = shop.get('name', '商家')
-                folium.Marker(
-                    location=[lat, lon],
-                    popup=name,
-                    icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                ).add_to(merchant_layer)
+            try:
+                shops_json = json.load(f)
+                shops_data = shops_json.get("features", [])
+                for shop in shops_data:
+                    geometry = shop.get("geometry", {})
+                    properties = shop.get("properties", {})
+                    coords = geometry.get("coordinates", [])
+                    if len(coords) == 2:
+                        lon, lat = coords
+                        name = properties.get("name", "商家")
+                        folium.Marker(
+                            location=[lat, lon],
+                            popup=name,
+                            icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
+                        ).add_to(merchant_layer)
+            except Exception as e:
+                print(f"❌ 無法讀取商家地標: {e}")
 
-    # 分業務路線
     gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
 
