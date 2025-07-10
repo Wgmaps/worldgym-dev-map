@@ -16,7 +16,7 @@ def extract_name(filename):
 
 def generate_map_for_folder(gpx_folder):
     print(f"📍 處理資料夾：{gpx_folder}")
-    m = folium.Map(location=[22.6273, 120.3014], zoom_start=13, control_scale=True)
+    m = folium.Map(location=[22.7283, 120.3273], zoom_start=15, control_scale=True)  # 高雄楠梓中心點
 
     title_html = f'''
          <h3 align="center" style="font-size:24px">
@@ -31,7 +31,6 @@ def generate_map_for_folder(gpx_folder):
     merchant_layer = folium.FeatureGroup(name='🏪 特約商家')
     m.add_child(merchant_layer)
 
-    # 載入商家地標 (GeoJSON 格式)
     shops_file = os.path.join(gpx_folder, 'shops.json')
     if os.path.exists(shops_file):
         with open(shops_file, 'r', encoding='utf-8') as f:
@@ -45,9 +44,14 @@ def generate_map_for_folder(gpx_folder):
                     if len(coords) == 2:
                         lon, lat = coords
                         name = properties.get("name", "商家")
+                        note = properties.get("note", "")
+                        emoji = properties.get("emoji", "")
+
+                        popup_html = f"<b>{emoji} {name}</b><br>備註: {note}"
+
                         folium.Marker(
                             location=[lat, lon],
-                            popup=name,
+                            popup=popup_html,
                             icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
                         ).add_to(merchant_layer)
             except Exception as e:
