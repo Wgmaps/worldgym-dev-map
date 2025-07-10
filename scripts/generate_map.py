@@ -35,7 +35,7 @@ def generate_map_for_folder(gpx_folder):
     if os.path.exists(shops_file):
         with open(shops_file, 'r', encoding='utf-8') as f:
             try:
-    shops_json = json.load(f)
+    shops_json = json.load(f)    
     shops_data = shops_json.get("features", [])
     for shop in shops_data:
         geometry = shop.get("geometry", {})
@@ -60,6 +60,8 @@ def generate_map_for_folder(gpx_folder):
 
 except Exception as e:
     print(f"❌ 無法讀取商家地標: {e}")
+
+
 
     gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
