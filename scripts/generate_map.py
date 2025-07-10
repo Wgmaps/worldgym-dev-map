@@ -3,6 +3,7 @@ import os
 import re
 import folium
 import gpxpy
+import json
 
 # 自動處理所有月份資料夾
 folders = sorted([f for f in os.listdir() if os.path.isdir(f) and f.startswith("2025-")])
@@ -32,6 +33,22 @@ def generate_map_for_folder(gpx_folder):
     merchant_layer = folium.FeatureGroup(name='🏪 特約商家')
     m.add_child(merchant_layer)
 
+    # 嘗試載入 shops.json
+    shops_file = os.path.join(gpx_folder, 'shops.json')
+    if os.path.exists(shops_file):
+        with open(shops_file, 'r', encoding='utf-8') as f:
+            shops_data = json.load(f)
+            for shop in shops_data:
+                lat = shop.get('lat')
+                lon = shop.get('lon')
+                name = shop.get('name', '商家')
+                folium.Marker(
+                    location=[lat, lon],
+                    popup=name,
+                    icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
+                ).add_to(merchant_layer)
+
+    # 分業務路線
     gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
 
