@@ -35,30 +35,31 @@ def generate_map_for_folder(gpx_folder):
     if os.path.exists(shops_file):
         with open(shops_file, 'r', encoding='utf-8') as f:
             try:
-                shops_json = json.load(f)
-                shops_data = shops_json.get("features", [])
-                for shop in shops_data:
-                    geometry = shop.get("geometry", {})
-                    properties = shop.get("properties", {})
-                    coords = geometry.get("coordinates", [])
-                    if len(coords) == 2:
-                        lon, lat = coords
-                        name = properties.get("name", "商家")
-                        note = properties.get("note", "")
-                        emoji = properties.get("emoji", "")
+    shops_json = json.load(f)
+    shops_data = shops_json.get("features", [])
+    for shop in shops_data:
+        geometry = shop.get("geometry", {})
+        properties = shop.get("properties", {})
+        coords = geometry.get("coordinates", [])
+        if len(coords) == 2:
+            lon, lat = coords
+            name = properties.get("name", "商家")
+            note = properties.get("note", "")
+            emoji = properties.get("emoji", "")
 
-popup_html = f"""
-<div style='font-weight:bold; font-size:14px; min-width:120px;'>{emoji} {name}</div>
-<div style='font-size:12px; color:gray;'>{note}</div>
-"""
+            popup_html = f"""
+            <div style='font-weight:bold; font-size:14px; min-width:120px;'>{emoji} {name}</div>
+            <div style='font-size:12px; color:gray;'>{note}</div>
+            """
 
-                        folium.Marker(
-                            location=[lat, lon],
-                            popup=popup_html,
-                            icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                        ).add_to(merchant_layer)
-            except Exception as e:
-                print(f"❌ 無法讀取商家地標: {e}")
+            folium.Marker(
+                location=[lat, lon],
+                popup=popup_html,
+                icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
+            ).add_to(merchant_layer)
+
+except Exception as e:
+    print(f"❌ 無法讀取商家地標: {e}")
 
     gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
