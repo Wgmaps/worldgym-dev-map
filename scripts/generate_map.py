@@ -46,16 +46,12 @@ def generate_map_for_folder(gpx_folder):
                         note = properties.get("note", "")
                         emoji = properties.get("emoji", "")
 
-                        popup_html = f"<div style='font-size:14px; line-height:1.4;'>📍 {name}<br>{note}</div>"
+                        popup = folium.Popup(f"<b>{emoji} {name}</b><br>{note}", max_width=300)
+            folium.Marker(location=[lat, lon], popup=popup, icon=folium.Icon(color="red", icon="info-sign")).add_to(shop_group)
+        shop_group.add_to(m)
+    except Exception as e:
+        print(f"⚠️ 無法載入商家資料: {e}")
 
-                        folium.Marker(
-                            location=[lat, lon],
-                            popup=popup_html,
-                            icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                        ).add_to(merchant_layer)
-
-            except Exception as e:
-                print(f"❌ 無法讀取商家地標: {e}")
 
     gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
