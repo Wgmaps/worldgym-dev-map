@@ -73,7 +73,7 @@ def generate_map_for_folder(gpx_folder):
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = [(point.latitude, point.longitude) for point in segment.points]
-                        folium.PolyLine(points, color="blue", weight=4, opacity=0.8).add_to(agent_layers[name])
+                        folium.PolyLine(points, color="blue", weight=4, opacity=0.8, tooltip=folium.Tooltip(f"📄 {gpx_file}", sticky=True)).add_to(agent_layers[name])
         except Exception as e:
             print(f"❌ 無法處理 {gpx_file}: {e}")
 
