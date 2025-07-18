@@ -46,7 +46,7 @@ def generate_map_for_folder(gpx_folder):
                         note = properties.get("note", "")
                         emoji = properties.get("emoji", "")
 
-                        popup_html = f"<b>{emoji} {name}</b><br>{note}"
+                        popup_html = f"<div style='font-size:14px; line-height:1.4;'>📍 {name}<br>{note}</div>"
 
                         folium.Marker(
                             location=[lat, lon],
