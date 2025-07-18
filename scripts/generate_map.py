@@ -18,13 +18,13 @@ def generate_map_for_folder(gpx_folder):
     m = folium.Map(location=[22.7283, 120.3273], zoom_start=15, control_scale=True)
 
     title_html = f'''
-         <h3 align="center" style="font-size:24px">
-         🦍🌍 WorldGym NZXN 每日開發地圖 {gpx_folder} 💰
-         </h3>
-         <div style="text-align:center;margin-bottom:10px;">
-         <a href="../index.html"><button style="background-color:red;color:white;border:none;padding:5px 10px;border-radius:5px;">返回首頁</button></a>
-         </div>
-     '''
+        <h3 align="center" style="font-size:24px">
+        🦍🌍 WorldGym NZXN 每日開發地圖 {gpx_folder} 💰
+        </h3>
+        <div style="text-align:center;margin-bottom:10px;">
+        <a href="../index.html"><button style="background-color:red;color:white;border:none;padding:5px 10px;border-radius:5px;">返回首頁</button></a>
+        </div>
+    '''
     m.get_root().html.add_child(folium.Element(title_html))
 
 m.get_root().html.add_child(folium.Element("""
@@ -50,8 +50,8 @@ function searchShop() {
 }
 </script>
 <div style='position: fixed; top: 10px; right: 50px; z-index: 9999; background: white; padding: 5px 10px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.2);'>
-  <input type='text' id='shopSearch' placeholder='搜尋商家名稱...' style='width:160px;' onkeydown='if(event.key===\"Enter\")searchShop()'>
-  <button onclick='searchShop()'>搜尋</button>
+<input type='text' id='shopSearch' placeholder='搜尋商家名稱...' style='width:160px;' onkeydown='if(event.key===\"Enter\")searchShop()'>
+<button onclick='searchShop()'>搜尋</button>
 </div>
 <script>
 setTimeout(() => {
