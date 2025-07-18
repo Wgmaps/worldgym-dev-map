@@ -26,6 +26,33 @@ def generate_map_for_folder(gpx_folder):
          </div>
      '''
     m.get_root().html.add_child(folium.Element(title_html))
+m.get_root().html.add_child(folium.Element('''
+<script>
+function searchShop() {
+    const input = document.getElementById('shopSearch').value.trim();
+    if (!input) return;
+
+    let found = false;
+    for (let i in window.shopMarkers) {
+        const marker = window.shopMarkers[i];
+        const name = marker.getPopup().getContent();
+        if (name.includes(input)) {
+            marker.openPopup();
+            window.map.setView(marker.getLatLng(), 18);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        alert("找不到商家：" + input);
+    }
+}
+</script>
+<div style="position: fixed; top: 10px; right: 50px; z-index: 9999; background: white; padding: 5px 10px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.2);">
+  <input type="text" id="shopSearch" placeholder="搜尋商家名稱..." style="width:160px;" onkeydown="if(event.key==='Enter')searchShop()">
+  <button onclick="searchShop()">搜尋</button>
+</div>
+'''))
 
     merchant_layer = folium.FeatureGroup(name='🏪 特約商家')
     m.add_child(merchant_layer)
@@ -73,7 +100,7 @@ def generate_map_for_folder(gpx_folder):
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = [(point.latitude, point.longitude) for point in segment.points]
-                        folium.PolyLine(points, color="blue", weight=4, opacity=0.8, tooltip=folium.Tooltip(f"📄 {gpx_file}", sticky=True)).add_to(agent_layers[name])
+                        folium.PolyLine(points, color="blue", weight=4, opacity=0.8).add_to(agent_layers[name])
         except Exception as e:
             print(f"❌ 無法處理 {gpx_file}: {e}")
 
