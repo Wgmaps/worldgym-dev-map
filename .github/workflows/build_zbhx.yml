@@ -1,9 +1,11 @@
 name: Auto-build ZBHX map from main repo
 
 on:
+  repository_dispatch:
+    types: [zbhx-upload]
   workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *'  # 每天台灣時間上午10點執行
+    - cron: '0 2 * * *'  # 每天台灣時間 10:00 自動產圖
 
 jobs:
   build:
