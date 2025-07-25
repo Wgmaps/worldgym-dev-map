@@ -1,0 +1,37 @@
+name: Auto-build ZBHX Map
+
+on:
+  repository_dispatch:
+    types: [zbhx_update]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out main repo (worldgym-dev-map)
+        uses: actions/checkout@v3
+
+      - name: Clone ZBHX repo
+        run: |
+          git clone https://github.com/Wgmaps/ZBHX-dev-map.git zbhx-data
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run GPX map script for ZBHX
+        run: |
+          python generate_map.py --input zbhx-data/2025-07 --output zbhx
+
+      - name: Commit updated map
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add zbhx/
+          git commit -m "Update ZBHX map from webhook trigger" || echo "No changes to commit"
+          git push
