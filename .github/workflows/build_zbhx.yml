@@ -1,42 +1,37 @@
-name: Auto-build ZBHX map from main repo
+name: Auto-build ZBHX Map
 
 on:
   repository_dispatch:
-    types: [zbhx-upload]
-  workflow_dispatch:
-  schedule:
-    - cron: '0 2 * * *'  # 每天台灣時間 10:00 自動產圖
+    types: [zbhx_update]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout ZBHX repo
-      uses: actions/checkout@v3
-      with:
-        repository: Wgmaps/ZBHX-dev-map
-        token: ${{ secrets.ZBHX_TOKEN }}
-        path: zbhx
+      - name: Check out main repo (worldgym-dev-map)
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Clone ZBHX repo
+        run: |
+          git clone https://github.com/Wgmaps/ZBHX-dev-map.git zbhx-data
 
-    - name: Install dependencies
-      run: pip install folium gpxpy
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
 
-    - name: Generate map
-      run: python scripts/generate_map.py
-      working-directory: zbhx
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Commit and push updated map
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "actions@github.com"
-        git add .
-        git commit -m "auto: 更新ZBHX地圖" || echo "no changes"
-        git pull --rebase
-        git push
-      working-directory: zbhx
+      - name: Run GPX map script for ZBHX
+        run: |
+          python generate_map.py --input zbhx-data/2025-07 --output zbhx
+
+      - name: Commit updated map
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add zbhx/
+          git commit -m "Update ZBHX map from webhook trigger" || echo "No changes to commit"
+          git push
