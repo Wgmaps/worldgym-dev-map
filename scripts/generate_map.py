@@ -1,61 +1,100 @@
 
-import folium
 import os
+import folium
 import gpxpy
-from pathlib import Path
+from folium.plugins import BeautifyIcon
+import json
 
-def parse_gpx_file(gpx_path):
-    with open(gpx_path, 'r', encoding='utf-8') as f:
-        gpx = gpxpy.parse(f)
-    points = []
-    for track in gpx.tracks:
-        for segment in track.segments:
-            for point in segment.points:
-                points.append((point.latitude, point.longitude))
-    return points
+def extract_name_from_filename(filename):
+    return filename.split("_")[1].split(".")[0] if "_" in filename else "Unknown"
 
-def create_map(folder_path, output_path):
-    center_lat, center_lon = 22.73008, 120.331844
-    fmap = folium.Map(location=[center_lat, center_lon], zoom_start=15, control_scale=True)
+def create_map(center, zoom_start=15):
+    m = folium.Map(location=center, zoom_start=zoom_start, control_scale=True)
 
-    feature_groups = {}
-    folder = Path(folder_path)
-    for gpx_file in folder.glob("*.gpx"):
-        name = gpx_file.stem
-        user = name.split("_")[1] if "_" in name else "未分類"
-        points = parse_gpx_file(gpx_file)
-        if not points:
-            continue
-        fg = feature_groups.setdefault(user, folium.FeatureGroup(name=user, show=True))
-        folium.PolyLine(points, color="blue", weight=4, opacity=0.8, tooltip=name).add_to(fg)
+    # Base tiles
+    folium.TileLayer("openstreetmap", name="開發路線").add_to(m)
+    folium.TileLayer("cartodb positron", name="特約商家").add_to(m)
 
-    for fg in feature_groups.values():
-        fg.add_to(fmap)
+    return m
 
-    # 加公司地點
+def add_gpx_routes(folder_path, map_object):
+    layer_dict = {}
+
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".gpx"):
+            person_name = extract_name_from_filename(filename)
+            if person_name not in layer_dict:
+                layer_dict[person_name] = folium.FeatureGroup(name=person_name)
+                map_object.add_child(layer_dict[person_name])
+
+            with open(os.path.join(folder_path, filename), "r") as gpx_file:
+                gpx = gpxpy.parse(gpx_file)
+                for track in gpx.tracks:
+                    for segment in track.segments:
+                        points = [[point.latitude, point.longitude] for point in segment.points]
+                        if points:
+                            folium.PolyLine(points, color="blue", weight=3, opacity=0.8,
+                                            tooltip=filename).add_to(layer_dict[person_name])
+
+def add_shop_markers(shop_json_path, map_object):
+    try:
+        with open(shop_json_path, "r", encoding="utf-8") as f:
+            shops_json = json.load(f)
+            shops_data = shops_json.get("features", [])
+            group = folium.FeatureGroup(name="特約商家")
+            for shop in shops_data:
+                geometry = shop.get("geometry", {})
+                properties = shop.get("properties", {})
+                coords = geometry.get("coordinates", [])
+                if len(coords) == 2:
+                    lon, lat = coords
+                    name = properties.get("name", "商家")
+                    note = properties.get("note", "")
+                    emoji = properties.get("emoji", "")
+                    popup_html = f"<b>{emoji} {name}</b><br><span style='color:gray'>{note}</span>"
+                    group.add_child(folium.Marker(
+                        location=[lat, lon],
+                        popup=popup_html,
+                        icon=folium.Icon(color="red", icon="shopping-cart", prefix="fa")
+                    ))
+            map_object.add_child(group)
+    except Exception as e:
+        print(f"商家資料載入失敗: {e}")
+
+def add_home_marker(map_object, location, popup_text="公司位置"):
     folium.Marker(
-        location=[22.73008, 120.331844],
-        popup="🏢 公司位置",
-        icon=folium.Icon(color="green", icon="building", prefix="fa")
-    ).add_to(fmap)
+        location=location,
+        popup=popup_text,
+        icon=BeautifyIcon(
+            icon="fa-building",
+            border_color="black",
+            text_color="white",
+            background_color="green"
+        )
+    ).add_to(map_object)
 
-    folium.LayerControl(collapsed=False).add_to(fmap)
+def add_title(map_object, month, title="🦍🌍 WorldGym HZ 每日開發地圖"):
+    html = f"""<div style='position: fixed; top: 10px; left: 10px; z-index: 9999; 
+                    background: white; padding: 10px 15px; border-radius: 10px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 14px;'>
+                <b>{title}</b><br>
+                📅 月份：{month}<br>
+                🔙 <a href='../index.html' style='color: blue;'>返回首頁</a>
+              </div>"""
+    map_object.get_root().html.add_child(folium.Element(html))
 
-    # 自訂 HTML
-    title_html = '''
-        <div style="position: fixed; top: 10px; left: 10px; z-index: 9999; background-color: white; padding: 10px;
-                    border: 2px solid black; border-radius: 5px; font-size: 16px;">
-            <b>🦍🌍 WorldGym 分店 每日開發地圖</b><br>
-            🗓️ 月份：{month}<br>
-            <a href="../index.html" style="color: blue;">🔙 返回首頁</a>
-        </div>
-    '''.format(month=os.path.basename(folder_path))
-    fmap.get_root().html.add_child(folium.Element(title_html))
-
-    fmap.save(output_path)
+def generate(folder_name):
+    map_center = [22.73008, 120.331844]  # 新中心點
+    m = create_map(map_center)
+    add_gpx_routes(folder_name, m)
+    add_shop_markers(os.path.join(folder_name, "shops.json"), m)
+    add_home_marker(m, [22.73008, 120.331844])
+    add_title(m, folder_name.split("-")[-1])
+    folium.LayerControl().add_to(m)
+    m.save(os.path.join(folder_name, "index.html"))
 
 if __name__ == "__main__":
-    for folder in Path(".").glob("2025-*"):
-        if folder.is_dir():
-            output_file = folder / "index.html"
-            create_map(folder, output_file)
+    current_folder = os.getcwd()
+    for folder in os.listdir(current_folder):
+        if folder.startswith("2025-"):
+            generate(folder)
