@@ -5,13 +5,13 @@ folders = sorted([f for f in os.listdir() if f.startswith('2025-') and os.path.i
 
 # 對應標題格式（未來可調整）
 def format_title(folder):
-    return f"🦍🌍 WorldGym HZ 每日開發地圖 {folder} 💰"
+    return f"🦍🌍 WorldGym NZXN 每日開發地圖 {folder} 💰"
 
 html_head = '''<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>WorldGym HZ 地圖首頁</title>
+    <title>WorldGym NZXN 地圖首頁</title>
     <style>
         body { font-family: "Segoe UI", sans-serif; padding: 40px; }
         h1 { font-size: 26px; }
@@ -22,7 +22,7 @@ html_head = '''<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <h1>🦍🌍 WorldGym HZ 地圖首頁</h1>
+    <h1>🦍🌍 WorldGym NZXN 地圖首頁</h1>
     <ul>
 '''
 
