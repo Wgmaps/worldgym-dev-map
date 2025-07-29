@@ -79,7 +79,7 @@ def add_home_marker(map_object, location, popup_text="公司位置"):
                 background-color: white; padding: 10px 14px; border-radius: 8px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); line-height: 1.6;">
         <div><a href="../index.html" style="text-decoration:none;font-weight:bold;color:#d43f3a;">🔙 返回首頁</a></div>
-        <div style="font-size:16px; font-weight:bold;">🦍🌍 WorldGym HZ 每日開發地圖</div>
+        <div style="font-size:16px; font-weight:bold;">🦍🌍 WorldGym NZXN 每日開發地圖</div>
         <div style="font-size:14px;">📅 月份：<b>{gpx_folder} 💰</b></div>
     </div>
     '''
