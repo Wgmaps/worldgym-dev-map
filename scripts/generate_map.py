@@ -73,7 +73,7 @@ def add_home_marker(map_object, location, popup_text="公司位置"):
         )
     ).add_to(map_object)
 
-def add_title(map_object, month, title="🦍🌍 WorldGym HZ 每日開發地圖"):
+def add_title(map_object, month, title="🦍🌍 WorldGym NZXN 每日開發地圖"):
     html = f"""<div style='position: fixed; top: 10px; left: 10px; z-index: 9999; 
                     background: white; padding: 10px 15px; border-radius: 10px;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 14px;'>
