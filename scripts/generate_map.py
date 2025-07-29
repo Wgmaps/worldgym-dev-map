@@ -9,6 +9,25 @@ import gpxpy
 def generate_map_for_folder(gpx_folder):
     m = folium.Map(location=[22.626, 120.315], zoom_start=15)
 
+    # 自動從資料夾路徑抓取店代與月份
+    folder_parts = os.path.normpath(gpx_folder).split(os.sep)
+    store_code = folder_parts[-2] if len(folder_parts) >= 2 else "分店"
+    month_code = folder_parts[-1] if len(folder_parts) >= 1 else "月份"
+
+    header_html = f"""
+    <div style='position: fixed; top: 10px; left: 10px; z-index: 9999; background: white;
+                padding: 10px 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                font-family: sans-serif;'>
+      <div style='font-size: 14px; font-weight: bold;'>
+        <a href='../index.html' style='color: red; text-decoration: none;'>🔙 返回首頁</a>
+      </div>
+      <div style='margin-top: 5px; font-size: 18px;'>🦍🌍 <b>WorldGym {store_code} 每日開發地圖</b></div>
+      <div style='font-size: 14px; margin-top: 5px;'>📅 月份：<b>{month_code}</b> 💰</div>
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(header_html))
+
+
     merchant_layer = folium.FeatureGroup(name="🛍️ 特約商家")
     m.add_child(merchant_layer)
 
