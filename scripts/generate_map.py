@@ -31,8 +31,7 @@ def generate_map_for_folder(gpx_folder):
     merchant_layer = folium.FeatureGroup(name="🛍️ 特約商家")
     m.add_child(merchant_layer)
 
-    shops_file = os.path.join(gpx_folder, 'shops.json')
-    if os.path.exists(shops_file):
+    
         try:
             with open(shops_file, 'r', encoding='utf-8') as f:
                 shops_json = json.load(f)
