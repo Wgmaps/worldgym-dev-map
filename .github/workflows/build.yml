@@ -26,10 +26,12 @@ jobs:
       run: pip install folium gpxpy
 
     - name: Generate Maps for All Months
+      working-directory: ${{ github.workspace }}
       run: |
-        for folder in $(ls -d */ | grep -E '^[0-9]{4}-[0-9]{2}$'); do
-          echo "🔄 正在產生 $folder"
-          python scripts/generate_map.py "$folder"
+        for folder in $(find . -maxdepth 1 -type d -regex './[0-9]{4}-[0-9]{2}'); do
+          folder_name=$(basename "$folder")
+          echo "🔄 正在產生 $folder_name"
+          python scripts/generate_map.py "$folder_name"
         done
 
     - name: Commit and Push Map
