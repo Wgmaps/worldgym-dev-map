@@ -1,80 +1,90 @@
 
-import folium
 import os
 import json
+import folium
+from folium import FeatureGroup, LayerControl
+from folium.plugins import Search
 import gpxpy
-from pathlib import Path
 
-def generate_map(folder):
-    # 正確中心點與公司位置
-    center_lat, center_lon = 22.73008, 120.331844
-    map_center = [center_lat, center_lon]
+def generate_map_for_folder(gpx_folder):
+    m = folium.Map(location=[22.626, 120.315], zoom_start=15)
 
-    m = folium.Map(location=map_center, zoom_start=15)
+    # 自動從資料夾路徑抓取店代與月份
+    folder_parts = os.path.normpath(gpx_folder).split(os.sep)
+    store_code = folder_parts[-2] if len(folder_parts) >= 2 else "分店"
+    month_code = folder_parts[-1] if len(folder_parts) >= 1 else "月份"
 
-    # 圖層群組
-    route_group = folium.FeatureGroup(name="🚴‍♀️ 開發路線")
-    shop_group = folium.FeatureGroup(name="🛍️ 特約商家")
+    header_html = f"""
+    <div style='position: fixed; top: 10px; left: 10px; z-index: 9999; background: white;
+                padding: 10px 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                font-family: sans-serif;'>
+      <div style='font-size: 14px; font-weight: bold;'>
+        <a href='../index.html' style='color: red; text-decoration: none;'>🔙 返回首頁</a>
+      </div>
+      <div style='margin-top: 5px; font-size: 18px;'>🦍🌍 <b>WorldGym {store_code} 每日開發地圖</b></div>
+      <div style='font-size: 14px; margin-top: 5px;'>📅 月份：<b>{month_code}</b> 💰</div>
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(header_html))
 
-    # GPX 讀取
-    gpx_files = [f for f in os.listdir(folder) if f.endswith(".gpx")]
-    if gpx_files:
-        for gpx_file in gpx_files:
-            gpx_path = os.path.join(folder, gpx_file)
-            with open(gpx_path, 'r', encoding='utf-8') as f:
-                gpx = gpxpy.parse(f)
 
-            for track in gpx.tracks:
-                for segment in track.segments:
-                    points = [(point.latitude, point.longitude) for point in segment.points]
-                    folium.PolyLine(points, color="blue", weight=4.5, opacity=0.7).add_to(route_group)
-        print(f"✅ 已加入 GPX 路線：{', '.join(gpx_files)}")
-    else:
-        print("⚠️ 無 GPX 路線")
+    merchant_layer = folium.FeatureGroup(name="🛍️ 特約商家")
+    m.add_child(merchant_layer)
 
-    # 商家資料
-    shops_path = os.path.join(folder, "shops.json")
-    if os.path.exists(shops_path):
-        with open(shops_path, 'r', encoding='utf-8') as f:
-            shops_data = json.load(f).get("features", [])
-        for shop in shops_data:
-            geometry = shop.get("geometry", {})
-            properties = shop.get("properties", {})
-            coords = geometry.get("coordinates", [])
-            if len(coords) == 2:
-                lon, lat = coords
-                name = properties.get("name", "商家")
-                note = properties.get("note", "")
-                emoji = properties.get("emoji", "")
-                popup_html = f"""<div style='font-weight:bold; font-size:14px; min-width:120px;'>{emoji} {name}</div>
-                <div style='font-size:12px; color:gray;'>{note}</div>"""
-                folium.Marker(
-                    location=[lat, lon],
-                    popup=popup_html,
-                    icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                ).add_to(shop_group)
-        print(f"✅ 已載入商家共 {len(shops_data)} 筆")
-    else:
-        print("⚠️ 沒有找到 shops.json")
+    shops_file = os.path.join(gpx_folder, 'shops.json')
+    if os.path.exists(shops_file):
+        try:
+            with open(shops_file, 'r', encoding='utf-8') as f:
+                shops_json = json.load(f)
+                shops_data = shops_json.get("features", [])
+                for shop in shops_data:
+                    geometry = shop.get("geometry", {})
+                    properties = shop.get("properties", {})
+                    coords = geometry.get("coordinates", [])
+                    if len(coords) == 2:
+                        lon, lat = coords
+                        name = properties.get("name", "商家")
+                        note = properties.get("note", "")
+                        emoji = properties.get("emoji", "")
+                        popup_html = f"<b>{emoji} {name}</b><br>{note}"
+                        folium.Marker(
+                            location=[lat, lon],
+                            popup=popup_html,
+                            icon=folium.Icon(color="red", icon="shopping-cart", prefix='fa')
+                        ).add_to(merchant_layer)
+        except Exception as e:
+            print(f"❌ 無法讀取商家資料檔: {e}")
 
-    # 公司位置
-    folium.Marker(
-        location=[center_lat, center_lon],
-        popup="🏠 公司位置",
-        icon=folium.Icon(color='green', icon='home')
-    ).add_to(m)
+    gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
+    agent_layers = {}
 
-    # 加入圖層群組
-    route_group.add_to(m)
-    shop_group.add_to(m)
-    folium.LayerControl().add_to(m)
+    for gpx_file in gpx_files:
+        filepath = os.path.join(gpx_folder, gpx_file)
+        with open(filepath, 'r', encoding='utf-8') as f:
+            gpx = gpxpy.parse(f)
 
-    # 存檔
-    m.save(os.path.join(folder, "index.html"))
-    print(f"✅ 地圖已產出：{folder}/index.html")
+        if gpx.tracks:
+            track = gpx.tracks[0]
+            name = track.name or os.path.splitext(gpx_file)[0]
+            coords = [(p.latitude, p.longitude) for s in track.segments for p in s.points]
+            if not coords:
+                continue
 
-# 範例執行（實際自動化由 GitHub Action 指定路徑）
-if __name__ == "__main__":
-    import sys
-    folder_path = sys.argv[1] if len(sys.argv) > 1 else "2025-08"
-    generate_map(folder_path)
+            agent_name = name.split()[0]
+            if agent_name not in agent_layers:
+                agent_layers[agent_name] = folium.FeatureGroup(name=agent_name)
+                m.add_child(agent_layers[agent_name])
+
+            folium.PolyLine(
+                locations=coords,
+                color="blue",
+                weight=3,
+                opacity=0.8,
+                tooltip=name
+            ).add_to(agent_layers[agent_name])
+
+    LayerControl(collapsed=False).add_to(m)
+
+    output_file = os.path.join(gpx_folder, "index.html")
+    m.save(output_file)
+    print(f"✅ 地圖已儲存至: {output_file}")
