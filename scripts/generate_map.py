@@ -86,5 +86,9 @@ def generate_map_for_folder(gpx_folder):
     LayerControl(collapsed=False).add_to(m)
 
     output_file = os.path.join(gpx_folder, "index.html")
-    m.save(output_file)
+    
+    output_path = os.path.join(gpx_folder, "index.html")
+    m.save(output_path)
+    print(f"✅ 已成功產出地圖：{output_path}")
+
     print(f"✅ 地圖已儲存至: {output_file}")
