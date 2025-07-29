@@ -34,6 +34,7 @@ def generate_map_for_folder(gpx_folder):
     shops_file = os.path.join(gpx_folder, 'shops.json')
     if os.path.exists(shops_file):
         try:
+        pass  # 占位，避免空 try 區塊錯誤
         print(f"📁 資料夾來源：{gpx_folder}")
         gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
         print(f"🔍 找到的 GPX 檔案：{gpx_files}")
