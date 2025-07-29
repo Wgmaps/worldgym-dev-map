@@ -18,7 +18,7 @@ def generate_map_for_folder(gpx_folder):
         if not os.path.exists(shops_file):
             print("⚠️ 找不到 shops.json，略過商家地標")
 
-        m = folium.Map(location=[22.626, 120.315], zoom_start=15)
+        m = folium.Map(location=[22.7298662,120.2656636], zoom_start=15)
 
         # 加入商家地標
         if os.path.exists(shops_file):
