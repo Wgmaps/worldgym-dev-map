@@ -1,9 +1,9 @@
 import os
 import json
 import folium
+import gpxpy
 from folium import FeatureGroup, LayerControl
 from folium.plugins import Search
-import gpxpy
 
 def generate_map_for_folder(gpx_folder):
     try:
@@ -18,10 +18,20 @@ def generate_map_for_folder(gpx_folder):
         if not os.path.exists(shops_file):
             print("⚠️ 找不到 shops.json，略過商家地標")
 
-        m = folium.Map(location=[22.7298662,120.2656636], zoom_start=15)
+        # 固定公司中心點
+        m = folium.Map(location=[22.7298662, 120.2656636], zoom_start=15)
 
-        # 加入商家地標
+        # 公司位置標記
+        folium.Marker(
+            location=[22.7298662, 120.2656636],
+            popup="🏢 公司位置",
+            icon=folium.Icon(color='green', icon='home', prefix='fa')
+        ).add_to(m)
+
+        # 商家圖層
         if os.path.exists(shops_file):
+            merchant_layer = folium.FeatureGroup(name="🛍️ 特約商家")
+            merchant_layer.add_to(m)
             try:
                 with open(shops_file, 'r', encoding='utf-8') as f:
                     shops_json = json.load(f)
@@ -42,11 +52,14 @@ def generate_map_for_folder(gpx_folder):
                                 location=[lat, lon],
                                 popup=popup_html,
                                 icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                            ).add_to(m)
+                            ).add_to(merchant_layer)
             except Exception as e:
-                print(f"⚠️ 商家地標處理失敗：{e}")
+                print(f"⚠️ 商家處理錯誤：{e}")
 
-        # 載入 GPX 路線
+        # 路線圖層
+        route_layer = folium.FeatureGroup(name="🚴‍♀️ 開發路線")
+        route_layer.add_to(m)
+
         for gpx_file in gpx_files:
             full_path = os.path.join(gpx_folder, gpx_file)
             with open(full_path, 'r', encoding='utf-8') as gpx_f:
@@ -54,19 +67,21 @@ def generate_map_for_folder(gpx_folder):
                 for track in gpx.tracks:
                     for segment in track.segments:
                         points = [(point.latitude, point.longitude) for point in segment.points]
-                        folium.PolyLine(points, color="blue", weight=3).add_to(m)
+                        if points:
+                            folium.PolyLine(points, color="blue", weight=3).add_to(route_layer)
+                            print(f"✅ 已加入 GPX 路線：{gpx_file}")
 
-        # 顯示商家圖層開關
+        # 圖層開關
         LayerControl().add_to(m)
 
-        # 自動加入標題與返回首頁區塊
+        # 標題與返回首頁
         folder_parts = os.path.normpath(gpx_folder).split(os.sep)
         store_code = folder_parts[-2] if len(folder_parts) >= 2 else "分店"
         month_code = folder_parts[-1] if len(folder_parts) >= 1 else "月份"
 
         header_html = f"""<div style='position: fixed; top: 10px; left: 10px; z-index: 9999; background: white;
-                    padding: 10px 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                    font-family: sans-serif;'>
+                        padding: 10px 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                        font-family: sans-serif;'>
           <div style='font-size: 14px; font-weight: bold;'>
             <a href='../index.html' style='color: red; text-decoration: none;'>🔙 返回首頁</a>
           </div>
@@ -78,6 +93,7 @@ def generate_map_for_folder(gpx_folder):
         output_path = os.path.join(gpx_folder, "index.html")
         m.save(output_path)
         print(f"✅ 已成功產出地圖：{output_path}")
+
     except Exception as e:
         print(f"❌ 發生錯誤：{e}")
 
