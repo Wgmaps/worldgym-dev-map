@@ -80,3 +80,7 @@ def generate_map_for_folder(gpx_folder):
         print(f"✅ 已成功產出地圖：{output_path}")
     except Exception as e:
         print(f"❌ 發生錯誤：{e}")
+
+import sys
+if __name__ == "__main__":
+    generate_map_for_folder(sys.argv[1])
