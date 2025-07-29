@@ -1,86 +1,61 @@
 
-import os
 import folium
+import os
 import gpxpy
-import json
+from pathlib import Path
 
-gpx_folder = os.environ.get("GPX_FOLDER", ".")
+def parse_gpx_file(gpx_path):
+    with open(gpx_path, 'r', encoding='utf-8') as f:
+        gpx = gpxpy.parse(f)
+    points = []
+    for track in gpx.tracks:
+        for segment in track.segments:
+            for point in segment.points:
+                points.append((point.latitude, point.longitude))
+    return points
 
-# 中心座標
-center = [22.73008, 120.331844]
-m = folium.Map(location=center, zoom_start=15)
+def create_map(folder_path, output_path):
+    center_lat, center_lon = 22.73008, 120.331844
+    fmap = folium.Map(location=[center_lat, center_lon], zoom_start=15, control_scale=True)
 
-# 新增圖層控制器
-layer_control = folium.map.LayerControl(collapsed=False)
+    feature_groups = {}
+    folder = Path(folder_path)
+    for gpx_file in folder.glob("*.gpx"):
+        name = gpx_file.stem
+        user = name.split("_")[1] if "_" in name else "未分類"
+        points = parse_gpx_file(gpx_file)
+        if not points:
+            continue
+        fg = feature_groups.setdefault(user, folium.FeatureGroup(name=user, show=True))
+        folium.PolyLine(points, color="blue", weight=4, opacity=0.8, tooltip=name).add_to(fg)
 
-# 商家地標
-shops_path = os.path.join(gpx_folder, "shops.json")
-if os.path.exists(shops_path):
-    try:
-        with open(shops_path, "r", encoding="utf-8") as f:
-            shops_data = json.load(f).get("features", [])
-            for shop in shops_data:
-                geometry = shop.get("geometry", {})
-                props = shop.get("properties", {})
-                coords = geometry.get("coordinates", [])
-                if len(coords) == 2:
-                    lon, lat = coords
-                    name = props.get("name", "商家")
-                    note = props.get("note", "")
-                    emoji = props.get("emoji", "")
-                    popup_html = f"<div style='font-weight:bold;'>{emoji} {name}</div><div style='font-size:12px; color:gray;'>{note}</div>"
-                    folium.Marker(
-                        location=[lat, lon],
-                        popup=popup_html,
-                        icon=folium.Icon(color='red', icon='shopping-cart', prefix='fa')
-                    ).add_to(m)
-    except Exception as e:
-        print(f"商家標記載入錯誤: {e}")
+    for fg in feature_groups.values():
+        fg.add_to(fmap)
 
-# 公司位置
-folium.Marker(
-    location=center,
-    popup="🏠 公司位置",
-    icon=folium.Icon(color="green", icon="home", prefix="fa")
-).add_to(m)
+    # 加公司地點
+    folium.Marker(
+        location=[22.73008, 120.331844],
+        popup="🏢 公司位置",
+        icon=folium.Icon(color="green", icon="building", prefix="fa")
+    ).add_to(fmap)
 
-# 載入所有 .gpx 檔案，依人名建立圖層群組
-for filename in os.listdir(gpx_folder):
-    if filename.endswith(".gpx"):
-        filepath = os.path.join(gpx_folder, filename)
-        try:
-            with open(filepath, "r", encoding="utf-8") as gpx_file:
-                gpx = gpxpy.parse(gpx_file)
-                name_key = filename.split("_")[1].replace(".gpx", "")
-                if not name_key:
-                    name_key = "路線"
+    folium.LayerControl(collapsed=False).add_to(fmap)
 
-                # 如果該人名圖層不存在就創建
-                if name_key not in m._children:
-                    group = folium.FeatureGroup(name=name_key)
-                    m.add_child(group)
-                else:
-                    group = m._children[name_key]
+    # 自訂 HTML
+    title_html = '''
+        <div style="position: fixed; top: 10px; left: 10px; z-index: 9999; background-color: white; padding: 10px;
+                    border: 2px solid black; border-radius: 5px; font-size: 16px;">
+            <b>🦍🌍 WorldGym 分店 每日開發地圖</b><br>
+            🗓️ 月份：{month}<br>
+            <a href="../index.html" style="color: blue;">🔙 返回首頁</a>
+        </div>
+    '''.format(month=os.path.basename(folder_path))
+    fmap.get_root().html.add_child(folium.Element(title_html))
 
-                for track in gpx.tracks:
-                    for segment in track.segments:
-                        points = [(point.latitude, point.longitude) for point in segment.points]
-                        folium.PolyLine(
-                            points,
-                            color="blue",
-                            weight=4,
-                            opacity=0.7,
-                            tooltip=filename  # 滑鼠提示
-                        ).add_to(group)
+    fmap.save(output_path)
 
-        except Exception as e:
-            print(f"❌ 無法載入 {filename}: {e}")
-
-# 加入圖層控制器與首頁按鈕
-layer_control.add_to(m)
-home_button = folium.Html('<a href="../index.html" style="position:absolute;top:10px;left:10px;z-index:9999;font-weight:bold;font-size:16px;background:white;padding:5px;border-radius:4px;text-decoration:none;">🏠 返回首頁</a>', script=True)
-folium.Marker(center, icon=folium.DivIcon(html=home_button)).add_to(m)
-
-# 儲存地圖
-output_path = os.path.join(gpx_folder, "index.html")
-m.save(output_path)
+if __name__ == "__main__":
+    for folder in Path(".").glob("2025-*"):
+        if folder.is_dir():
+            output_file = folder / "index.html"
+            create_map(folder, output_file)
