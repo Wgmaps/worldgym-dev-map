@@ -31,9 +31,18 @@ def generate_map_for_folder(gpx_folder):
     merchant_layer = folium.FeatureGroup(name="🛍️ 特約商家")
     m.add_child(merchant_layer)
 
-    
+    shops_file = os.path.join(gpx_folder, 'shops.json')
+    if os.path.exists(shops_file):
         try:
-            with open(shops_file, 'r', encoding='utf-8') as f:
+        print(f"📁 資料夾來源：{gpx_folder}")
+        gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
+        print(f"🔍 找到的 GPX 檔案：{gpx_files}")
+        if not gpx_files:
+            print("⚠️ 找不到 GPX 檔案，略過這個資料夾")
+            return
+        shops_file = os.path.join(gpx_folder, 'shops.json')
+        if not os.path.exists(shops_file):
+            print("⚠️ 找不到 shops.json，略過商家地標")
                 shops_json = json.load(f)
                 shops_data = shops_json.get("features", [])
                 for shop in shops_data:
@@ -54,10 +63,8 @@ def generate_map_for_folder(gpx_folder):
         except Exception as e:
             print(f"❌ 無法讀取商家資料檔: {e}")
 
-    gpx_files = [f for f in os.listdir(gpx_folder) if f.endswith('.gpx')]
     agent_layers = {}
 
-    for gpx_file in gpx_files:
         filepath = os.path.join(gpx_folder, gpx_file)
         with open(filepath, 'r', encoding='utf-8') as f:
             gpx = gpxpy.parse(f)
