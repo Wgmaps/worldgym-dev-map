@@ -33,6 +33,10 @@ jobs:
           python scripts/generate_map.py "$folder_name"
         done
 
+    
+    - name: Generate Homepage Index
+      run: python scripts/generate_home.py
+
     - name: Commit and Push Map
       run: |
         git config --global user.name "github-actions"
