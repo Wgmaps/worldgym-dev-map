@@ -73,15 +73,17 @@ def add_home_marker(map_object, location, popup_text="公司位置"):
         )
     ).add_to(map_object)
 
-def add_title(map_object, month, title="🦍🌍 WorldGym HZ 每日開發地圖"):
-    html = f"""<div style='position: fixed; top: 10px; left: 10px; z-index: 9999; 
-                    background: white; padding: 10px 15px; border-radius: 10px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.3); font-size: 14px;'>
-                <b>{title}</b><br>
-                📅 月份：{month}<br>
-                🔙 <a href='../index.html' style='color: blue;'>返回首頁</a>
-              </div>"""
-    map_object.get_root().html.add_child(folium.Element(html))
+ # ⬅️ 返回首頁按鈕 + 標題（固定左上角）
+    header_html = f'''
+    <div style="position: fixed; top: 10px; left: 10px; z-index: 9999;
+                background-color: white; padding: 10px 14px; border-radius: 8px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3); line-height: 1.6;">
+        <div><a href="../index.html" style="text-decoration:none;font-weight:bold;color:#d43f3a;">🔙 返回首頁</a></div>
+        <div style="font-size:16px; font-weight:bold;">🦍🌍 WorldGym HZ 每日開發地圖</div>
+        <div style="font-size:14px;">📅 月份：<b>{gpx_folder} 💰</b></div>
+    </div>
+    '''
+    m.get_root().html.add_child(folium.Element(header_html))
 
 def generate(folder_name):
     map_center = [22.73008, 120.331844]  # 新中心點
