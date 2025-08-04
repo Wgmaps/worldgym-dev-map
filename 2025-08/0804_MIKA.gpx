@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-08-04T12:58:56Z</time>
+ </metadata>
+ <trk>
+  <name>傍晚電動自行車騎乘</name>
+  <type>ebikeride</type>
+  <trkseg>
+   <trkpt lat="22.7301670" lon="120.3320470">
+    <ele>21.3</ele>
+    <time>2025-08-04T12:58:56Z</time>
+   </trkpt>
+   <trkpt lat="22.7301670" lon="120.3320470">
+    <ele>21.3</ele>
+    <time>2025-08-04T12:59:02Z</time>
+   </trkpt>
+   <trkpt lat="22.7301650" lon="120.3320510">
+    <ele>21.3</ele>
+    <time>2025-08-04T12:59:04Z</time>
+   </trkpt>
+   <trkpt lat="22.7301520" lon="120.3320630">
+    <ele>21.2</ele>
+    <time>2025-08-04T12:59:05Z</time>
+   </trkpt>
+   <trkpt lat="22.7301450" lon="120.3320750">
+    <ele>21.2</ele>
+    <time>2025-08-04T12:59:06Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
