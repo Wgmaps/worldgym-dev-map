@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-08-20T06:37:00Z</time>
+ </metadata>
+ <trk>
+  <name>午後電動自行車騎乘</name>
+  <type>ebikeride</type>
+  <trkseg>
+   <trkpt lat="22.7602510" lon="120.3043920">
+    <ele>6.9</ele>
+    <time>2025-08-20T06:37:00Z</time>
+   </trkpt>
+   <trkpt lat="22.7602770" lon="120.3043980">
+    <ele>7.0</ele>
+    <time>2025-08-20T06:37:01Z</time>
+   </trkpt>
+   <trkpt lat="22.7602810" lon="120.3043840">
+    <ele>7.0</ele>
+    <time>2025-08-20T06:37:02Z</time>
+   </trkpt>
+   <trkpt lat="22.7602840" lon="120.3043710">
+    <ele>7.0</ele>
+    <time>2025-08-20T06:37:03Z</time>
+   </trkpt>
+   <trkpt lat="22.7602870" lon="120.3043570">
+    <ele>7.1</ele>
+    <time>2025-08-20T06:37:04Z</time>
+   </trkpt>
+   <trkpt lat="22.7602910" lon="120.3043430">
+    <ele>7.1</ele>
+    <time>2025-08-20T06:37:06Z</time>
+   </trkpt>
+   <trkpt lat="22.7602940" lon="120.3043290">
+    <ele>7.1</ele>
+    <time>2025-08-20T06:37:07Z</time>
+   </trkpt>
+   <trkpt lat="22.7602970" lon="120.3043190">
+    <ele>7.2</ele>
+    <time>2025-08-20T06:37:08Z</time>
+   </trkpt>
+   <trkpt lat="22.7603020" lon="120.3043090">
+    <ele>7.2</ele>
+    <time>2025-08-20T06:37:09Z</time>
+   </trkpt>
+   <trkpt lat="22.7603130" lon="120.3043030">
+    <ele>7.2</ele>
+    <time>2025-08-20T06:37:10Z</time>
+   </trkpt>
+   <trkpt lat="22.7603300" lon="120.3042920">
+    <ele>7.3</ele>
+    <time>2025-08-20T06:37:11Z</time>
+   </trkpt>
+   <trkpt lat="22.7603380" lon="120.3042880">
+    <ele>7.3</ele>
+    <time>2025-08-20T06:37:12Z</time>
+   </trkpt>
+   <trkpt lat="22.7603450" lon="120.3042830">
+    <ele>7.3</ele>
+    <time>2025-08-20T06:37:13Z</time>
+   </trkpt>
+   <trkpt lat="22.7603560" lon="120.3042790">
+    <ele>7.4</ele>
+    <time>2025-08-20T06:37:14Z</time>
+   </trkpt>
+   <trkpt lat="22.7603600" lon="120.3042730">
+    <ele>7.4</ele>
+    <time>2025-08-20T06:37:15Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
