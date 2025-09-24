@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-09-24T06:04:35Z</time>
+ </metadata>
+ <trk>
+  <name>午後騎乘</name>
+  <type>cycling</type>
+  <trkseg>
+   <trkpt lat="22.7239340" lon="120.3463020">
+    <ele>18.4</ele>
+    <time>2025-09-24T06:04:35Z</time>
+   </trkpt>
+   <trkpt lat="22.7239340" lon="120.3463020">
+    <ele>18.4</ele>
+    <time>2025-09-24T06:04:37Z</time>
+   </trkpt>
+   <trkpt lat="22.7239850" lon="120.3463150">
+    <ele>18.5</ele>
+    <time>2025-09-24T06:04:44Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
