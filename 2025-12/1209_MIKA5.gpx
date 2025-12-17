@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-12-09T07:12:51Z</time>
+ </metadata>
+ <trk>
+  <name>午後電動自行車騎乘</name>
+  <type>ebikeride</type>
+  <trkseg>
+   <trkpt lat="22.7256970" lon="120.3533070">
+    <ele>24.0</ele>
+    <time>2025-12-09T07:12:51Z</time>
+   </trkpt>
+   <trkpt lat="22.7256760" lon="120.3532600">
+    <ele>23.9</ele>
+    <time>2025-12-09T07:12:53Z</time>
+   </trkpt>
+   <trkpt lat="22.7256910" lon="120.3532360">
+    <ele>23.9</ele>
+    <time>2025-12-09T07:12:54Z</time>
+   </trkpt>
+   <trkpt lat="22.7256950" lon="120.3532230">
+    <ele>23.9</ele>
+    <time>2025-12-09T07:12:55Z</time>
+   </trkpt>
+   <trkpt lat="22.7256810" lon="120.3531900">
+    <ele>23.8</ele>
+    <time>2025-12-09T07:12:56Z</time>
+   </trkpt>
+   <trkpt lat="22.7256680" lon="120.3531400">
+    <ele>23.8</ele>
+    <time>2025-12-09T07:12:57Z</time>
+   </trkpt>
+   <trkpt lat="22.7256540" lon="120.3530830">
+    <ele>23.7</ele>
+    <time>2025-12-09T07:12:58Z</time>
+   </trkpt>
+   <trkpt lat="22.7256420" lon="120.3530340">
+    <ele>23.6</ele>
+    <time>2025-12-09T07:12:59Z</time>
+   </trkpt>
+   <trkpt lat="22.7256330" lon="120.3529750">
+    <ele>23.5</ele>
+    <time>2025-12-09T07:13:00Z</time>
+   </trkpt>
+   <trkpt lat="22.7256300" lon="120.3529240">
+    <ele>23.4</ele>
+    <time>2025-12-09T07:13:01Z</time>
+   </trkpt>
+   <trkpt lat="22.7256200" lon="120.3528640">
+    <ele>23.3</ele>
+    <time>2025-12-09T07:13:02Z</time>
+   </trkpt>
+   <trkpt lat="22.7256140" lon="120.3527880">
+    <ele>23.2</ele>
+    <time>2025-12-09T07:13:03Z</time>
+   </trkpt>
+   <trkpt lat="22.7256050" lon="120.3527190">
+    <ele>23.1</ele>
+    <time>2025-12-09T07:13:04Z</time>
+   </trkpt>
+   <trkpt lat="22.7255930" lon="120.3526320">
+    <ele>23.0</ele>
+    <time>2025-12-09T07:13:05Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
