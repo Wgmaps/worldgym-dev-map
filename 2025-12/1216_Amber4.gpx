@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-12-16T06:01:45Z</time>
+ </metadata>
+ <trk>
+  <name>午後騎乘</name>
+  <type>cycling</type>
+  <trkseg>
+   <trkpt lat="22.7284310" lon="120.3227690">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:45Z</time>
+   </trkpt>
+   <trkpt lat="22.7283870" lon="120.3228040">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:46Z</time>
+   </trkpt>
+   <trkpt lat="22.7283750" lon="120.3228220">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:47Z</time>
+   </trkpt>
+   <trkpt lat="22.7283680" lon="120.3228310">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:48Z</time>
+   </trkpt>
+   <trkpt lat="22.7283600" lon="120.3228410">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:49Z</time>
+   </trkpt>
+   <trkpt lat="22.7283450" lon="120.3228680">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:50Z</time>
+   </trkpt>
+   <trkpt lat="22.7283420" lon="120.3228720">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:52Z</time>
+   </trkpt>
+   <trkpt lat="22.7283400" lon="120.3228750">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:53Z</time>
+   </trkpt>
+   <trkpt lat="22.7283370" lon="120.3228790">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:54Z</time>
+   </trkpt>
+   <trkpt lat="22.7283350" lon="120.3228830">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:55Z</time>
+   </trkpt>
+   <trkpt lat="22.7283340" lon="120.3228860">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:56Z</time>
+   </trkpt>
+   <trkpt lat="22.7283330" lon="120.3228870">
+    <ele>17.8</ele>
+    <time>2025-12-16T06:01:57Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>

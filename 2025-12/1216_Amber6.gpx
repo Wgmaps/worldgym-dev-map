@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd" creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1">
+ <metadata>
+  <time>2025-12-16T05:48:36Z</time>
+ </metadata>
+ <trk>
+  <name>午後騎乘</name>
+  <type>cycling</type>
+  <trkseg>
+   <trkpt lat="22.7278040" lon="120.3210860">
+    <ele>18.0</ele>
+    <time>2025-12-16T05:48:36Z</time>
+   </trkpt>
+   <trkpt lat="22.7277670" lon="120.3211080">
+    <ele>18.0</ele>
+    <time>2025-12-16T05:48:39Z</time>
+   </trkpt>
+   <trkpt lat="22.7277300" lon="120.3211300">
+    <ele>18.0</ele>
+    <time>2025-12-16T05:48:40Z</time>
+   </trkpt>
+   <trkpt lat="22.7276920" lon="120.3211510">
+    <ele>18.0</ele>
+    <time>2025-12-16T05:48:41Z</time>
+   </trkpt>
+   <trkpt lat="22.7276550" lon="120.3211730">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:42Z</time>
+   </trkpt>
+   <trkpt lat="22.7276690" lon="120.3211600">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:43Z</time>
+   </trkpt>
+   <trkpt lat="22.7276930" lon="120.3211360">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:44Z</time>
+   </trkpt>
+   <trkpt lat="22.7276950" lon="120.3211360">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:45Z</time>
+   </trkpt>
+   <trkpt lat="22.7277050" lon="120.3211240">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:46Z</time>
+   </trkpt>
+   <trkpt lat="22.7277030" lon="120.3211240">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:47Z</time>
+   </trkpt>
+   <trkpt lat="22.7277000" lon="120.3211250">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:48Z</time>
+   </trkpt>
+   <trkpt lat="22.7276930" lon="120.3211330">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:49Z</time>
+   </trkpt>
+   <trkpt lat="22.7276980" lon="120.3211340">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:50Z</time>
+   </trkpt>
+   <trkpt lat="22.7276980" lon="120.3211340">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:51Z</time>
+   </trkpt>
+   <trkpt lat="22.7277040" lon="120.3211280">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:52Z</time>
+   </trkpt>
+   <trkpt lat="22.7277050" lon="120.3211250">
+    <ele>17.9</ele>
+    <time>2025-12-16T05:48:53Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
