@@ -1,10 +1,11 @@
 from pathlib import Path
 import os
+import re
 
-# 所有資料夾
-folders = sorted([f for f in os.listdir() if f.startswith('2025-') and os.path.isdir(f)])
+# 只抓 YYYY-MM 格式的資料夾（例如 2025-12、2026-01）
+pattern = re.compile(r"^\d{4}-\d{2}$")
+folders = sorted([f for f in os.listdir() if pattern.match(f) and os.path.isdir(f)])
 
-# 對應標題格式（未來可調整）
 def format_title(folder):
     return f"🦍🌍 WorldGym NZXN 每日開發地圖 {folder} 💰"
 
@@ -37,7 +38,6 @@ html_tail = '''    </ul>
 </html>
 '''
 
-# 合併並儲存
 full_html = html_head + html_body + html_tail
 Path("index.html").write_text(full_html, encoding="utf-8")
 print("✅ 已產生首頁 index.html")
