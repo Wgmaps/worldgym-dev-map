@@ -36,9 +36,8 @@ def create_map(center, zoom_start=15):
     return m
 
 def add_gpx_routes(folder_path, map_object):
-    # 使用「小寫」當 key 做去重；用第一次遇到的寫法當顯示名稱
-    layer_dict = {}          # key: lower_name -> FeatureGroup
-    display_name_dict = {}   # key: lower_name -> original display name (第一次遇到)
+    layer_dict = {}
+    display_name_dict = {}
 
     for filename in os.listdir(folder_path):
         if not filename.lower().endswith(".gpx"):
@@ -47,20 +46,17 @@ def add_gpx_routes(folder_path, map_object):
         person_name = extract_name_from_filename(filename)
         lower_key = person_name.lower()
 
-        # 建立/取得圖層
         if lower_key not in layer_dict:
-            display_name_dict[lower_key] = person_name  # 記住第一次遇到的寫法
+            display_name_dict[lower_key] = person_name
             layer = folium.FeatureGroup(name=display_name_dict[lower_key])
             layer_dict[lower_key] = layer
             map_object.add_child(layer)
 
-        # 繪線
         gpx_path = os.path.join(folder_path, filename)
         try:
             with open(gpx_path, "r", encoding="utf-8") as gpx_file:
                 gpx = gpxpy.parse(gpx_file)
         except Exception:
-            # 有些 GPX 可能不是 UTF-8，也嘗試無編碼宣告開啟
             with open(gpx_path, "r") as gpx_file:
                 gpx = gpxpy.parse(gpx_file)
 
@@ -102,7 +98,6 @@ def add_shop_markers(shop_json_path, map_object):
                 ))
         map_object.add_child(group)
     except Exception as e:
-        # 不中斷產出，只是略過商家圖層
         print(f"[shops.json 載入失敗] {e}")
 
 def add_home_marker(map_object, location):
@@ -129,19 +124,19 @@ def add_title(map_object, month, title="🦍🌍 WorldGym NZXN 每日開發地�
     map_object.get_root().html.add_child(folium.Element(html))
 
 def generate(folder_name):
-    # 固定新中心點（可依門市調整）
     map_center = [22.73008, 120.331844]
     m = create_map(map_center)
     add_gpx_routes(folder_name, m)
     add_shop_markers(os.path.join(folder_name, "shops.json"), m)
     add_home_marker(m, [22.73008, 120.331844])
-    # 顯示月份（假設資料夾類似 2025-10）
     add_title(m, folder_name.split("-")[-1])
     folium.LayerControl().add_to(m)
     m.save(os.path.join(folder_name, "index.html"))
 
 if __name__ == "__main__":
     current_folder = os.getcwd()
+    pattern = re.compile(r"^\d{4}-\d{2}$")
+
     for folder in os.listdir(current_folder):
-        if folder.startswith("2025-"):
+        if pattern.match(folder) and os.path.isdir(folder):
             generate(folder)
