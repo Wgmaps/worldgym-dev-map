@@ -1,4 +1,3 @@
-
 name: Auto-generate map
 
 on:
@@ -27,7 +26,7 @@ jobs:
 
     - name: Generate Maps for All Months
       run: |
-        for folder in $(ls -d 2025-*/); do
+        for folder in $(ls -d ????-??/ 2>/dev/null); do
           folder_name=$(basename "$folder")
           echo "🔄 正在產生 $folder_name"
           python scripts/generate_map.py "$folder_name"
