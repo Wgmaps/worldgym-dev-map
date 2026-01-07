@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+ <metadata>
+  <time>2026-01-06T08:35:12Z</time>
+ </metadata>
+ <trk>
+  <name>午後電動自行車騎乘</name>
+  <type>ebikeride</type>
+  <trkseg>
+   <trkpt lat="22.7236680" lon="120.3279320">
+    <ele>19.4</ele>
+    <time>2026-01-06T08:35:12Z</time>
+   </trkpt>
+   <trkpt lat="22.7236590" lon="120.3279210">
+    <ele>19.5</ele>
+    <time>2026-01-06T08:35:13Z</time>
+   </trkpt>
+   <trkpt lat="22.7236470" lon="120.3279080">
+    <ele>19.6</ele>
+    <time>2026-01-06T08:35:14Z</time>
+   </trkpt>
+   <trkpt lat="22.7236300" lon="120.3279000">
+    <ele>19.6</ele>
+    <time>2026-01-06T08:35:15Z</time>
+   </trkpt>
+   <trkpt lat="22.7236190" lon="120.3278990">
+    <ele>19.7</ele>
+    <time>2026-01-06T08:35:16Z</time>
+   </trkpt>
+   <trkpt lat="22.7236080" lon="120.3278980">
+    <ele>19.7</ele>
+    <time>2026-01-06T08:35:17Z</time>
+   </trkpt>
+   <trkpt lat="22.7236070" lon="120.3278860">
+    <ele>19.7</ele>
+    <time>2026-01-06T08:35:18Z</time>
+   </trkpt>
+   <trkpt lat="22.7235930" lon="120.3278800">
+    <ele>19.7</ele>
+    <time>2026-01-06T08:35:19Z</time>
+   </trkpt>
+   <trkpt lat="22.7235930" lon="120.3278800">
+    <ele>19.7</ele>
+    <time>2026-01-06T08:35:20Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
