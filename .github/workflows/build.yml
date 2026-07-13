@@ -5,6 +5,8 @@ on:
     paths:
       - '**.gpx'
       - '**/shops.json'
+      - 'scripts/generate_map.py'
+      - 'scripts/generate_home.py'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
@@ -13,34 +15,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
-    - name: Install dependencies
-      run: pip install folium gpxpy
+      - name: Install dependencies
+        run: pip install folium gpxpy
 
-    - name: Generate Maps for All Months
-      run: |
-        for folder in $(ls -d ????-??/ 2>/dev/null); do
-          folder_name=$(basename "$folder")
-          echo "🔄 正在產生 $folder_name"
-          python scripts/generate_map.py "$folder_name"
-        done
+      - name: Generate Maps for All Months
+        shell: bash
+        run: |
+          shopt -s nullglob
+          folders=(????-??/)
 
-    
-    - name: Generate Homepage Index
-      run: python scripts/generate_home.py
+          if [ ${#folders[@]} -eq 0 ]; then
+            echo "⚠️ 找不到任何 YYYY-MM 月份資料夾"
+          fi
 
-    - name: Commit and Push Map
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "actions@github.com"
-        git add .
-        git commit -m "auto: 更新地圖" || echo "No changes to commit"
-        git pull --rebase
-        git push
+          for folder in "${folders[@]}"; do
+            folder_name="${folder%/}"
+            echo "🔄 正在產生 $folder_name"
+            python scripts/generate_map.py "$folder_name"
+          done
+
+      - name: Generate Homepage Index
+        run: python scripts/generate_home.py
+
+      - name: Commit and Push Map
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "auto: 更新地圖" || echo "No changes to commit"
+          git pull --rebase
+          git push
