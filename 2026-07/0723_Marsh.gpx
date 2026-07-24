@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+ <metadata>
+  <name>123</name>
+  <author>
+   <name>Marsh Chen</name>
+   <link href="https://www.strava.com/athletes/1018583160"/>
+  </author>
+  <copyright author="OpenStreetMap contributors">
+   <year>2020</year>
+   <license>https://www.openstreetmap.org/copyright</license>
+  </copyright>
+  <link href="https://www.strava.com/routes/3515403940907740738"/>
+ </metadata>
+ <trk>
+  <name>123</name>
+  <link href="https://www.strava.com/routes/3515403940907740738"/>
+  <type>running</type>
+  <trkseg>
+   <trkpt lat="22.742410000000003" lon="120.33733000000001">
+    <ele>19.55</ele>
+   </trkpt>
+   <trkpt lat="22.74226" lon="120.33752000000001">
+    <ele>19.91</ele>
+   </trkpt>
+   <trkpt lat="22.742430000000002" lon="120.33731000000002">
+    <ele>19.5</ele>
+   </trkpt>
+   <trkpt lat="22.742890000000003" lon="120.33745">
+    <ele>21.740000000000002</ele>
+   </trkpt>
+   <trkpt lat="22.742800000000003" lon="120.33743000000001">
+    <ele>21.210000000000004</ele>
+   </trkpt>
+   <trkpt lat="22.742430000000002" lon="120.33731000000002">
+    <ele>19.5</ele>
+   </trkpt>
+   <trkpt lat="22.74276" lon="120.33696">
+    <ele>19.42</ele>
+   </trkpt>
+   <trkpt lat="22.742980000000003" lon="120.33664000000002">
+    <ele>19.17</ele>
+   </trkpt>
+   <trkpt lat="22.743540000000003" lon="120.33714">
+    <ele>25.86</ele>
+   </trkpt>
+   <trkpt lat="22.74332" lon="120.33740000000002">
+    <ele>24.32</ele>
+   </trkpt>
+   <trkpt lat="22.743540000000003" lon="120.33714">
+    <ele>25.86</ele>
+   </trkpt>
+   <trkpt lat="22.743810000000003" lon="120.33677000000002">
+    <ele>19.5</ele>
+   </trkpt>
+   <trkpt lat="22.744120000000002" lon="120.33705">
+    <ele>19.770000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.74356000150001" lon="120.3377450028512">
+    <ele>20.64</ele>
+   </trkpt>
+   <trkpt lat="22.743000000000002" lon="120.33844">
+    <ele>21.080000000000002</ele>
+   </trkpt>
+   <trkpt lat="22.742800000000003" lon="120.33825000000002">
+    <ele>21.040000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.7432" lon="120.33864000000001">
+    <ele>21.290000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.74314" lon="120.33858000000001">
+    <ele>21.26</ele>
+   </trkpt>
+   <trkpt lat="22.743000000000002" lon="120.33844">
+    <ele>21.19</ele>
+   </trkpt>
+   <trkpt lat="22.743560001505813" lon="120.33774500284399">
+    <ele>20.580000000000002</ele>
+   </trkpt>
+   <trkpt lat="22.744120000000002" lon="120.33705">
+    <ele>19.770000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.74434" lon="120.33726000000001">
+    <ele>19.790000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.74427" lon="120.33720000000001">
+    <ele>19.790000000000003</ele>
+   </trkpt>
+   <trkpt lat="22.74446" lon="120.33737">
+    <ele>19.83</ele>
+   </trkpt>
+   <trkpt lat="22.743890001560654" lon="120.33806500282809">
+    <ele>20.77</ele>
+   </trkpt>
+   <trkpt lat="22.74332" lon="120.33876000000001">
+    <ele>21.300000000000004</ele>
+   </trkpt>
+   <trkpt lat="22.742720000000002" lon="120.33818000000001">
+    <ele>21.03</ele>
+   </trkpt>
+   <trkpt lat="22.74219" lon="120.33762000000002">
+    <ele>20.080000000000002</ele>
+   </trkpt>
+   <trkpt lat="22.742430000000002" lon="120.33731000000002">
+    <ele>19.5</ele>
+   </trkpt>
+   <trkpt lat="22.742330000000003" lon="120.33721000000001">
+    <ele>19.48</ele>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
