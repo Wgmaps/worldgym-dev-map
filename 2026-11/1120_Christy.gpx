@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx creator="StravaGPX" version="1.1" xmlns="http://www.topografix.com/GPX/1/1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+ <metadata>
+  <time>2026-11-20T05:58:02Z</time>
+ </metadata>
+ <trk>
+  <name>午後騎乘</name>
+  <type>cycling</type>
+  <trkseg>
+   <trkpt lat="22.7269050" lon="120.3101220">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:02Z</time>
+   </trkpt>
+   <trkpt lat="22.7268970" lon="120.3101000">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:03Z</time>
+   </trkpt>
+   <trkpt lat="22.7268930" lon="120.3100870">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:04Z</time>
+   </trkpt>
+   <trkpt lat="22.7268980" lon="120.3101000">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:05Z</time>
+   </trkpt>
+   <trkpt lat="22.7269040" lon="120.3101100">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:06Z</time>
+   </trkpt>
+   <trkpt lat="22.7269080" lon="120.3101030">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:07Z</time>
+   </trkpt>
+   <trkpt lat="22.7269160" lon="120.3101160">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:08Z</time>
+   </trkpt>
+   <trkpt lat="22.7269250" lon="120.3101220">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:09Z</time>
+   </trkpt>
+   <trkpt lat="22.7269270" lon="120.3101280">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:10Z</time>
+   </trkpt>
+   <trkpt lat="22.7269270" lon="120.3101390">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:11Z</time>
+   </trkpt>
+   <trkpt lat="22.7269260" lon="120.3101490">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:12Z</time>
+   </trkpt>
+   <trkpt lat="22.7269190" lon="120.3101550">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:13Z</time>
+   </trkpt>
+   <trkpt lat="22.7269100" lon="120.3101610">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:14Z</time>
+   </trkpt>
+   <trkpt lat="22.7269000" lon="120.3101700">
+    <ele>16.9</ele>
+    <time>2026-11-20T05:58:15Z</time>
+   </trkpt>
+  </trkseg>
+ </trk>
+</gpx>
