@@ -24,9 +24,21 @@ def create_map(center, zoom_start=15):
         location=center,
         zoom_start=zoom_start,
         control_scale=True,
+        tiles=None,
     )
-    folium.TileLayer("openstreetmap", name="開發路線").add_to(map_object)
-    folium.TileLayer("cartodb positron", name="特約商家").add_to(map_object)
+
+    folium.TileLayer(
+        "OpenStreetMap",
+        name="開發路線",
+        show=True,
+    ).add_to(map_object)
+
+    folium.TileLayer(
+        "OpenStreetMap",
+        name="特約商家",
+        show=False,
+    ).add_to(map_object)
+
     return map_object
 
 
