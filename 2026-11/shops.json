@@ -1902,7 +1902,7 @@
       },
       "properties": {
         "name": "幸福香菇肉羹",
-        "note": "Mika",
+        "note": "Tara",
         "emoji": "🍴"
       }
     },
@@ -1977,7 +1977,7 @@
       },
       "properties": {
         "name": "林茶 Lin Te-茶飲.鍋燒.吐司",
-        "note": "Tara",
+        "note": "",
         "emoji": "🍴"
       }
     },
@@ -4378,6 +4378,36 @@
       "properties": {
         "name": "劉家東山聰肉餅",
         "note": "Christy",
+        "emoji": "🍴"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.3253274,
+          22.7398062
+        ]
+      },
+      "properties": {
+        "name": "馬蔥餅",
+        "note": "Christy",
+        "emoji": "🍴"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.3370321,
+          22.7362432
+        ]
+      },
+      "properties": {
+        "name": "劉記大腸關東煮",
+        "note": "Ben",
         "emoji": "🍴"
       }
     }
